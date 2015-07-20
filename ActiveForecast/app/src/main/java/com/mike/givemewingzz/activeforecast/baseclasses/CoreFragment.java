@@ -1,5 +1,6 @@
 package com.mike.givemewingzz.activeforecast.baseclasses;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -19,20 +20,20 @@ import android.view.animation.Transformation;
 import com.mike.givemewingzz.activeforecast.R;
 import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastBridge;
 import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastReceiverFragment;
-import com.mike.givemewingzz.activeforecast.navigationframework.toolbarframework.exceptions.ToolbarInteractionException;
 import com.mike.givemewingzz.activeforecast.navigationframework.navigation.CoreNavigationActivity;
 import com.mike.givemewingzz.activeforecast.navigationframework.navigation.NavigationHandler;
-import com.mike.givemewingzz.activeforecast.navigationframework.toolbarframework.utils.ToolbarOptions;
+import com.mike.givemewingzz.activeforecast.navigationframework.navigation.UserDataState;
+import com.mike.givemewingzz.activeforecast.navigationframework.toolbar.ToolbarOptions;
+import com.mike.givemewingzz.activeforecast.navigationframework.toolbarframework.exceptions.ToolbarInteractionException;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 public class CoreFragment extends Fragment
-    implements Toolbar.OnMenuItemClickListener, BroadcastReceiverFragment
-{
-    private class ToolbarAnimator extends Animation
-    {
+        implements Toolbar.OnMenuItemClickListener, BroadcastReceiverFragment {
+
+    private class ToolbarAnimator extends Animation {
 
         private int dp;
         private boolean hide;
@@ -48,14 +49,12 @@ public class CoreFragment extends Fragment
             toolbar.setLayoutParams(toolbarBufferLayoutParams);
         }
 
-        public void hide()
-        {
+        public void hide() {
             hide = true;
             toolbar.startAnimation(this);
         }
 
-        public void show()
-        {
+        public void show() {
             hide = false;
             toolbar.startAnimation(this);
         }
@@ -76,147 +75,124 @@ public class CoreFragment extends Fragment
     private ToolbarAnimator toolbarAnimator;
     private int toolbarDefaultHeight;
     private String uniqueFragmentID;
-    private int userDataChangedIndex;
+    private int userDataChangedIndex = 0;
     private UserDataState userDataState;
 
-    public CoreFragment()
-    {
-        userDataChangedIndex = 0;
-    }
-
-    public void checkIfUserDataChanged()
-    {
-        if (userDateStateChanged())
-        {
+    public void checkIfUserDataChanged() {
+        if (userDateStateChanged()) {
             userDataChanged();
             setLastUserActionTimestamp();
         }
     }
 
-    public String generateUniqueID()
-    {
+    public String generateUniqueID() {
         return UUID.randomUUID().toString();
     }
 
-    public String getFragmentID()
-    {
+    public String getFragmentID() {
         return uniqueFragmentID;
     }
 
-    public Set getIntentFilters()
-    {
+    public Set getIntentFilters() {
         return new HashSet();
     }
 
     public int getToolbarHeight()
-        throws ToolbarInteractionException
-    {
-        if (toolbar != null)
-        {
+            throws ToolbarInteractionException {
+        if (toolbar != null) {
             return toolbar.getHeight();
-        } else
-        {
+        } else {
             throw new ToolbarInteractionException("The toolbar is currently null, call setToolbar first.");
         }
     }
 
     public void hideToolbar(boolean flag)
-        throws ToolbarInteractionException
-    {
-        if (toolbar != null)
-        {
-            if (flag)
-            {
+            throws ToolbarInteractionException {
+        if (toolbar != null) {
+            if (flag) {
                 toolbarAnimator.hide();
                 return;
-            } else
-            {
-                ViewGroup.MarginLayoutParams marginlayoutparams = (ViewGroup.MarginLayoutParams)toolbar.getLayoutParams();
+            } else {
+                ViewGroup.MarginLayoutParams marginlayoutparams = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
                 marginlayoutparams.height = 0;
                 toolbar.setLayoutParams(marginlayoutparams);
                 return;
             }
-        } else
-        {
+        } else {
             throw new ToolbarInteractionException("The toolbar is currently null, call setToolbar first.");
         }
     }
 
-    public View initializeView(int i, LayoutInflater layoutinflater, ViewGroup viewgroup, Bundle bundle)
-    {
+    public View initializeView(int i, LayoutInflater layoutinflater, ViewGroup viewgroup, Bundle bundle) {
         return layoutinflater.inflate(i, viewgroup, false);
     }
 
-    public void onAttach(Activity activity)
-    {
+    @Override
+    public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof BroadcastBridge)
-        {
-            broadcastBridge = (BroadcastBridge)activity;
+        if (activity instanceof BroadcastBridge) {
+            broadcastBridge = (BroadcastBridge) activity;
             uniqueFragmentID = generateUniqueID();
             broadcastBridge.registerForBroadcasts(this);
         }
-        if (activity instanceof UserDataState)
-        {
-            userDataState = (UserDataState)activity;
+        if (activity instanceof UserDataState) {
+            userDataState = (UserDataState) activity;
         }
     }
 
-    public void onCreate(Bundle bundle)
-    {
+    @Override
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+        setHasOptionsMenu(true);
     }
 
-    public void onCreateOptionsMenu(Menu menu1, MenuInflater menuinflater)
-    {
+    @Override
+    public void onCreateOptionsMenu(Menu menu1, MenuInflater menuinflater) {
         super.onCreateOptionsMenu(menu1, menuinflater);
         menu1.clear();
     }
 
-    public void onDetach()
-    {
+    @Override
+    public void onDetach() {
         super.onDetach();
     }
 
-    public void onFragmentResumed()
-    {
-        if (getActivity() != null && (getActivity() instanceof NavigationHandler) && drawerToggleState != null)
-        {
-            ((NavigationHandler)getActivity()).setDrawerToggle(drawerToggleState);
+    public void onFragmentResumed() {
+        if (getActivity() != null && (getActivity() instanceof NavigationHandler) && drawerToggleState != null) {
+            ((NavigationHandler) getActivity()).setDrawerToggle(drawerToggleState);
         }
         checkIfUserDataChanged();
     }
 
-    public boolean onMenuItemClick(MenuItem menuitem)
-    {
+    @Override
+    public boolean onMenuItemClick(MenuItem menuitem) {
         return false;
     }
 
-    public void onResume()
-    {
+    @Override
+    public void onResume() {
         super.onResume();
     }
 
-    public void receiveBroadcast(Intent intent)
-    {
+    @Override
+    public void receiveBroadcast(Intent intent) {
+        //todo : Override in the clild class
     }
 
-    public void receiveFailedBroadcast(Intent intent)
-    {
+    @Override
+    public void receiveFailedBroadcast(Intent intent) {
+        //Todo : Override in the child class
     }
 
-    public void routeBroadcast(Intent intent)
-    {
-label0:
+    @Override
+    public void routeBroadcast(Intent intent) {
+        label0:
         {
             String s = intent.getAction();
-            if (s != null)
-            {
+            if (s != null) {
                 Log.d(TAG, (new StringBuilder()).append("ACTION TYPE : ").append(s).toString());
-                if (intent.getExtras() != null && intent.getExtras().containsKey("REQUEST_SUCCESS_KEY"))
-                {
-                    if (!intent.getExtras().getBoolean("REQUEST_SUCCESS_KEY"))
-                    {
+                if (intent.getExtras() != null && intent.getExtras().containsKey("REQUEST_SUCCESS_KEY")) {
+                    if (!intent.getExtras().getBoolean("REQUEST_SUCCESS_KEY")) {
                         break label0;
                     }
                     receiveBroadcast(intent);
@@ -227,16 +203,13 @@ label0:
         receiveFailedBroadcast(intent);
     }
 
-    public void setLastUserActionTimestamp()
-    {
-        if (userDataState != null)
-        {
+    public void setLastUserActionTimestamp() {
+        if (userDataState != null) {
             userDataChangedIndex = userDataState.getUserDataChangedIndex();
         }
     }
 
-    public void setNavDrawableID(int i)
-    {
+    public void setNavDrawableID(int i) {
         toolbar.setNavigationIcon(i);
     }
 
@@ -263,7 +236,7 @@ label0:
         if (options.attachToNavDrawer()) {
             if (getActivity() != null && getActivity() instanceof NavigationHandler) {
                 NavigationHandler navDrawerHandler = ((NavigationHandler) getActivity());
-                drawerToggleState = navDrawerHandler.setDrawerToggle(toolbar, options.getDrawerNavState(), options.getNavDrawerBackDrawableID());
+                drawerToggleState = navDrawerHandler.setupNavigationDrawer(toolbar, options.getDrawerNavState(), options.getNavDrawerBackDrawableID());
             }
         } else if (options.getNavDrawableID() != -1) {
             toolbar.setNavigationIcon(options.getNavDrawableID());
@@ -288,60 +261,48 @@ label0:
         }
     }
 
+    @SuppressLint("NewApi")
     public void setToolbarBackground(Drawable drawable)
-        throws ToolbarInteractionException
-    {
-        if (toolbar != null)
-        {
+            throws ToolbarInteractionException {
+        if (toolbar != null) {
             toolbar.setBackground(drawable);
             return;
-        } else
-        {
+        } else {
             throw new ToolbarInteractionException("The toolbar is currently null, call setToolbar first.");
         }
     }
 
     public void setToolbarTitle(String s)
-        throws ToolbarInteractionException
-    {
-        if (toolbar != null)
-        {
+            throws ToolbarInteractionException {
+        if (toolbar != null) {
             toolbar.setTitle(s);
             return;
-        } else
-        {
+        } else {
             throw new ToolbarInteractionException("The toolbar is currently null, call setToolbar first.");
         }
     }
 
     public void showToolbar(boolean flag)
-        throws ToolbarInteractionException
-    {
-        if (toolbar != null)
-        {
-            if (flag)
-            {
+            throws ToolbarInteractionException {
+        if (toolbar != null) {
+            if (flag) {
                 toolbarAnimator.show();
                 return;
-            } else
-            {
-                ViewGroup.MarginLayoutParams marginlayoutparams = (ViewGroup.MarginLayoutParams)toolbar.getLayoutParams();
+            } else {
+                ViewGroup.MarginLayoutParams marginlayoutparams = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
                 marginlayoutparams.height = toolbarDefaultHeight;
                 toolbar.setLayoutParams(marginlayoutparams);
                 return;
             }
-        } else
-        {
+        } else {
             throw new ToolbarInteractionException("The toolbar is currently null, call setToolbar first.");
         }
     }
 
-    public void userDataChanged()
-    {
+    public void userDataChanged() {
     }
 
-    public boolean userDateStateChanged()
-    {
+    public boolean userDateStateChanged() {
         return userDataState == null || userDataState.getUserDataChangedIndex() != userDataChangedIndex;
     }
 
