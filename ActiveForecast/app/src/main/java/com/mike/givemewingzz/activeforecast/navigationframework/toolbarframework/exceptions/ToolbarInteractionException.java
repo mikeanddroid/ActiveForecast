@@ -2,7 +2,7 @@
 // Jad home page: http://www.geocities.com/kpdus/jad.html
 // Decompiler options: braces fieldsfirst space lnc 
 
-package com.mike.givemewingzz.activeforecast.exceptions;
+package com.mike.givemewingzz.activeforecast.navigationframework.toolbarframework.exceptions;
 
 
 public class ToolbarInteractionException extends Exception

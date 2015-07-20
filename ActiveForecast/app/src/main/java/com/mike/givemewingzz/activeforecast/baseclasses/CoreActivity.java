@@ -1,4 +1,3 @@
-
 package com.mike.givemewingzz.activeforecast.baseclasses;
 
 import android.content.BroadcastReceiver;
@@ -13,294 +12,214 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.example.givemewingzz.activeforecast.applicationhandlers.FragmentTransactionHandler;
-import com.example.givemewingzz.activeforecast.services.broadcasthandler.BroadcastBridge;
-import com.example.givemewingzz.activeforecast.services.broadcasthandler.BroadcastReceiverFragment;
-import com.example.givemewingzz.activeforecast.services.broadcasthandler.FilteredBroadcastManger;
-import com.example.givemewingzz.activeforecast.toolbar.utils.FragmentTransactionAnimation;
+import com.mike.givemewingzz.activeforecast.R;
+import com.mike.givemewingzz.activeforecast.applicationhandlers.FragmentTransactionHandler;
+import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastBridge;
+import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastReceiverFragment;
+import com.mike.givemewingzz.activeforecast.broadcastnavigator.FilteredBroadcastManger;
+import com.mike.givemewingzz.activeforecast.navigationframework.toolbar.FragmentTransactionAnimation;
+import com.mike.givemewingzz.activeforecast.utils.ApplicationUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-// Referenced classes of package com.example.givemewingz.activeforecast.mike.activeweather:
-//            CoreFragment
-
 public class CoreActivity extends AppCompatActivity
-    implements FragmentTransactionHandler, BroadcastBridge
-{
+        implements FragmentTransactionHandler, BroadcastBridge {
 
-    private static final String TAG = com/example/givemewingz/activeforecast/mike/activeweather/CoreActivity.getSimpleName();
-    private FilteredBroadcastManger filteredBroadcastManger;
-    public BroadcastReceiver fragmentLifecycleReceiver;
-    private int userDataChangedIndex;
+    private static final String TAG = CoreActivity.class.getSimpleName();
+    private int userDataChangedIndex = 0;
+    private FilteredBroadcastManger filteredBroadcastManger = new FilteredBroadcastManger();
 
-    public CoreActivity()
-    {
-        userDataChangedIndex = 0;
-        filteredBroadcastManger = new FilteredBroadcastManger();
-        fragmentLifecycleReceiver = new BroadcastReceiver() {
 
-            final CoreActivity this$0;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
 
-            public void onReceive(Context context, Intent intent)
-            {
-                byte byte0;
-                context = intent.getAction();
-                byte0 = -1;
-                context.hashCode();
-                JVM INSTR lookupswitch 4: default 52
-            //                           -1586478827: 185
-            //                           -1229571005: 199
-            //                           -110495141: 157
-            //                           1668882681: 171;
-                   goto _L1 _L2 _L3 _L4 _L5
-_L1:
-                byte0;
-                JVM INSTR tableswitch 0 3: default 84
-            //                           0 213
-            //                           1 213
-            //                           2 213
-            //                           3 213;
-                   goto _L6 _L7 _L7 _L7 _L7
-_L6:
-                Log.d(CoreActivity.TAG, (new StringBuilder()).append("Base broadcast receiver received broadcast with type: ").append(context).toString());
-_L9:
-                for (context = filteredBroadcastManger.getFragmentsForFilter(intent.getAction()).iterator(); context.hasNext(); ((BroadcastReceiverFragment)context.next()).routeBroadcast(intent)) { }
-                break; /* Loop/switch isn't completed */
-_L4:
-                if (context.equals("CURRENT_WEATHER_DATA"))
-                {
-                    byte0 = 0;
-                }
-                continue; /* Loop/switch isn't completed */
-_L5:
-                if (context.equals("FORECAST_WEATHER_DATA"))
-                {
-                    byte0 = 1;
-                }
-                continue; /* Loop/switch isn't completed */
-_L2:
-                if (context.equals("HISTORIC_WEATHER_DATA"))
-                {
-                    byte0 = 2;
-                }
-                continue; /* Loop/switch isn't completed */
-_L3:
-                if (context.equals("HOURLY_WEATHER_DATA"))
-                {
-                    byte0 = 3;
-                }
-                continue; /* Loop/switch isn't completed */
-_L7:
-                userDataChangedIndex = int i = ((StringBuilder) (this)).StringBuilder + 1;
-                if (true) goto _L9; else goto _L8
-_L8:
-                return;
-                if (true) goto _L1; else goto _L10
-_L10:
-            }
+        getSupportFragmentManager().addOnBackStackChangedListener(
+                new FragmentManager.OnBackStackChangedListener() {
+                    @Override
+                    public void onBackStackChanged() {
+                        FragmentManager manager = getSupportFragmentManager();
+                        if (manager != null) {
+                            int backStackEntryCount = manager
+                                    .getBackStackEntryCount();
+                            if (backStackEntryCount < manager.getFragments()
+                                    .size()) {
+                                Fragment fragment = manager.getFragments().get(
+                                        backStackEntryCount);
+                                if (fragment != null
+                                        & fragment instanceof CoreFragment) {
+                                    ((CoreFragment) fragment)
+                                            .onFragmentResumed();
+                                }
+                            }
+                        }
+                    }
+                });
 
-            
-            {
-                this$0 = CoreActivity.this;
-                super();
-            }
-        };
     }
 
-    private void addExtraIntentFilters()
-    {
-    }
-
-    private void updateBroadcastReceiver()
-    {
-        Object obj = new HashSet();
-        IntentFilter intentfilter = new IntentFilter();
-        ((Set) (obj)).addAll(getActivityIntentFilters());
-        ((Set) (obj)).addAll(filteredBroadcastManger.getActiveFilters());
-        for (obj = ((Set) (obj)).iterator(); ((Iterator) (obj)).hasNext(); intentfilter.addAction((String)((Iterator) (obj)).next())) { }
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(fragmentLifecycleReceiver);
-        LocalBroadcastManager.getInstance(this).registerReceiver(fragmentLifecycleReceiver, intentfilter);
-    }
-
-    public List getActivityIntentFilters()
-    {
-        return new ArrayList();
-    }
-
-    public int getUserDataChangedIndex()
-    {
+    public int getUserDataChangedIndex() {
         return userDataChangedIndex;
     }
 
-    public void loadFragment(CoreFragment corefragment, boolean flag, boolean flag1)
-    {
+    /**
+     * Base BroadcastReceiver allows the activity a change to handle the broadcast and then passes
+     * the intent along to any interested fragments.
+     */
+    BroadcastReceiver fragmentLifecycleReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String broadcastType = intent.getAction();
+
+            Log.d(CoreActivity.TAG, (new StringBuilder()).append("Base broadcast receiver received broadcast with type: ").append(broadcastType).toString());
+
+            switch (broadcastType) {
+
+                case ApplicationUtils.Receivers.CURRENT_WEATHER_DATA:
+                case ApplicationUtils.Receivers.FORECAST_WEATHER_DATA:
+                case ApplicationUtils.Receivers.HISTORIC_WEATHER_DATA:
+                case ApplicationUtils.Receivers.HOURLY_WEATHER_DATA:
+                    userDataChangedIndex = ++userDataChangedIndex;
+                    break;
+                default:
+                    Log.d(TAG, "Base broadcast receiver received broadcast with type: " + broadcastType);
+
+            }
+
+            // Pass the intent on to any attached fragments that are interested in this broadcast type //
+            for (BroadcastReceiverFragment broadcastReceiverFragment : filteredBroadcastManger.getFragmentsForFilter(intent.getAction())) {
+                broadcastReceiverFragment.routeBroadcast(intent);
+            }
+
+        }
+    };
+
+    private void addExtraIntentFilters() {
+    }
+
+    /**
+     * Collects a list of intent filters from all registered BroadcastReceiverFragments and combines
+     * them into a single IntentFilter to register with the broadcast receiver.
+     */
+    private void updateBroadcastReceiver() {
+        Set<String> filters = new HashSet<>();
+        IntentFilter combinedFilter = new IntentFilter();
+        filters.addAll(getActivityIntentFilters());
+        filters.addAll(filteredBroadcastManger.getActiveFilters());
+
+        for (String intentFilter : filters) {
+            combinedFilter.addAction(intentFilter);
+        }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(fragmentLifecycleReceiver);
+        LocalBroadcastManager.getInstance(this).registerReceiver(fragmentLifecycleReceiver, combinedFilter);
+    }
+
+    public List getActivityIntentFilters() {
+        return new ArrayList();
+    }
+
+    /**
+     * Used to change the currently displayed fragment for an activity.
+     *
+     * @param fragment       - the new fragment to display
+     * @param replace        - if true the fragment will replace the current fragment, else it will be added.
+     * @param addToBackStack - if true the fragment will be added to the back stack
+     * @param animIn         - used to customize the entrance / exit animations of this transaction
+     * @param animOut
+     * @param animPopIn
+     * @param animPopout
+     */
+    @Override
+    public void loadFragment(CoreFragment fragment, boolean replace, boolean addToBackStack, int animIn, int animOut, int animPopIn, int animPopout, String tag) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (animIn != -1 && animOut != -1 && animPopIn != -1 && animPopout != -1) {
+            transaction = transaction.setCustomAnimations(animIn, animOut, animPopIn, animOut);
+        } else if (animIn != -1 && animOut != -1) {
+            transaction = transaction.setCustomAnimations(animIn, animOut);
+        }
+
+        if (tag == null) {
+            tag = fragment.getClass().getSimpleName();
+        }
+
+        if (replace) {
+            transaction = transaction.replace(R.id.container, fragment, tag);
+        } else {
+            transaction = transaction.add(R.id.container, fragment, tag);
+        }
+
+        if (addToBackStack) {
+            transaction = transaction.addToBackStack(null);
+        }
+
+        transaction.commit();
+    }
+
+    @Override
+    public void loadFragment(CoreFragment corefragment, boolean flag, boolean flag1) {
         loadFragment(corefragment, flag, flag1, -1, -1, -1, -1, null);
     }
 
-    public void loadFragment(CoreFragment corefragment, boolean flag, boolean flag1, int i, int j, int k, int l, 
-            String s)
-    {
-        Object obj1 = getSupportFragmentManager().beginTransaction();
-        Object obj;
-        if (i != -1 && j != -1 && k != -1 && l != -1)
-        {
-            obj = ((FragmentTransaction) (obj1)).setCustomAnimations(i, j, k, j);
-        } else
-        {
-            obj = obj1;
-            if (i != -1)
-            {
-                obj = obj1;
-                if (j != -1)
-                {
-                    obj = ((FragmentTransaction) (obj1)).setCustomAnimations(i, j);
-                }
-            }
-        }
-        obj1 = s;
-        if (s == null)
-        {
-            obj1 = corefragment.getClass().getSimpleName();
-        }
-        if (flag)
-        {
-            corefragment = ((FragmentTransaction) (obj)).replace(0x7f0c0052, corefragment, ((String) (obj1)));
-        } else
-        {
-            corefragment = ((FragmentTransaction) (obj)).add(0x7f0c0052, corefragment, ((String) (obj1)));
-        }
-        s = corefragment;
-        if (flag1)
-        {
-            s = corefragment.addToBackStack(null);
-        }
-        s.commit();
-    }
-
-    public void loadFragment(CoreFragment corefragment, boolean flag, boolean flag1, FragmentTransactionAnimation fragmenttransactionanimation)
-    {
+    @Override
+    public void loadFragment(CoreFragment corefragment, boolean flag, boolean flag1, FragmentTransactionAnimation fragmenttransactionanimation) {
         loadFragment(corefragment, flag, flag1, fragmenttransactionanimation.entrance, fragmenttransactionanimation.exit, fragmenttransactionanimation.popEntrance, fragmenttransactionanimation.popExit, null);
     }
 
-    public void loadFragment(CoreFragment corefragment, boolean flag, boolean flag1, String s)
-    {
+    @Override
+    public void loadFragment(CoreFragment corefragment, boolean flag, boolean flag1, String s) {
         loadFragment(corefragment, flag, flag1, -1, -1, -1, -1, s);
     }
 
-    protected void onCreate(Bundle bundle)
-    {
-        super.onCreate(bundle);
-        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-
-            final CoreActivity this$0;
-
-            public void onBackStackChanged()
-            {
-                Object obj = getSupportFragmentManager();
-                if (obj != null)
-                {
-                    int i = ((FragmentManager) (obj)).getBackStackEntryCount();
-                    if (i < ((FragmentManager) (obj)).getFragments().size())
-                    {
-                        obj = (Fragment)((FragmentManager) (obj)).getFragments().get(i);
-                        if (obj != null)
-                        {
-                            i = 1;
-                        } else
-                        {
-                            i = 0;
-                        }
-                        if (i & (obj instanceof CoreFragment))
-                        {
-                            ((CoreFragment)obj).onFragmentResumed();
-                        }
-                    }
-                }
-            }
-
-            
-            {
-                this$0 = CoreActivity.this;
-                super();
-            }
-        });
-    }
-
-    protected void onPause()
-    {
+    @Override
+    protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(fragmentLifecycleReceiver);
     }
 
-    protected void onResume()
-    {
+    @Override
+    protected void onResume() {
         super.onResume();
         updateBroadcastReceiver();
     }
 
-    public void popBackStack()
-    {
+    @Override
+    public void popBackStack() {
         FragmentManager fragmentmanager = getSupportFragmentManager();
-        if (fragmentmanager.getBackStackEntryCount() > 0)
-        {
+        if (fragmentmanager.getBackStackEntryCount() > 0) {
             fragmentmanager.popBackStack();
-            return;
-        } else
-        {
+        } else {
             finish();
-            return;
         }
     }
 
-    public void registerForBroadcast(BroadcastReceiverFragment broadcastreceiverfragment, String s)
-    {
+    @Override
+    public void registerForBroadcast(BroadcastReceiverFragment broadcastreceiverfragment, String s) {
         filteredBroadcastManger.registerForSingleBroadcast(broadcastreceiverfragment, s);
         updateBroadcastReceiver();
     }
 
-    public void registerForBroadcasts(BroadcastReceiverFragment broadcastreceiverfragment)
-    {
+    @Override
+    public void registerForBroadcasts(BroadcastReceiverFragment broadcastreceiverfragment) {
         filteredBroadcastManger.registerForBroadcasts(broadcastreceiverfragment);
         updateBroadcastReceiver();
     }
 
-    public void unRegisterForBroadcast(String s, String s1)
-    {
+    @Override
+    public void unRegisterForBroadcast(String s, String s1) {
         filteredBroadcastManger.unRegisterForSingleBroadcast(s, s1);
         updateBroadcastReceiver();
     }
 
-    public void unRegisterForBroadcasts(String s)
-    {
+    @Override
+    public void unRegisterForBroadcasts(String s) {
         filteredBroadcastManger.unRegisterForBroadcasts(s);
         updateBroadcastReceiver();
     }
-
-
-
-/*
-    static int access$002(CoreActivity coreactivity, int i)
-    {
-        coreactivity.userDataChangedIndex = i;
-        return i;
-    }
-
-*/
-
-
-/*
-    static int access$004(CoreActivity coreactivity)
-    {
-        int i = coreactivity.userDataChangedIndex + 1;
-        coreactivity.userDataChangedIndex = i;
-        return i;
-    }
-
-*/
-
 
 }

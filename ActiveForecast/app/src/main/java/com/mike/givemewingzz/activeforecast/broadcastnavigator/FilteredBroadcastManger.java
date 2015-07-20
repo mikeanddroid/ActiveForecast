@@ -1,7 +1,3 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.mike.givemewingzz.activeforecast.broadcastnavigator;
 
 import java.util.ArrayList;
@@ -12,137 +8,110 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// Referenced classes of package com.example.givemewingz.activeforecast.mike.services.broadcasthandler:
-//            BroadcastReceiverFragment
+public class FilteredBroadcastManger {
 
-public class FilteredBroadcastManger
-{
+    private final Map<String, Map<String, BroadcastReceiverFragment>> filterMap = Collections.synchronizedMap(new HashMap<String, Map<String, BroadcastReceiverFragment>>());
 
-    private final Map filterMap = Collections.synchronizedMap(new HashMap());
-
-    public FilteredBroadcastManger()
-    {
-    }
-
-    public Set getActiveFilters()
-    {
-        Set set;
-        synchronized (filterMap)
-        {
-            set = filterMap.keySet();
+    /**
+     * Returns the set of active filters
+     *
+     * @return - set of active intent filters
+     */
+    public Set<String> getActiveFilters() {
+        synchronized (filterMap) {
+            return filterMap.keySet();
         }
-        return set;
-        exception;
-        map;
-        JVM INSTR monitorexit ;
-        throw exception;
     }
 
-    public List getFragmentsForFilter(String s)
-    {
-label0:
-        {
-            synchronized (filterMap)
-            {
-                if (!filterMap.containsKey(s))
-                {
-                    break label0;
+    /**
+     * Returns a list of BroadcastReceiverFragment that are registered for the passed in
+     * intent filter.
+     *
+     * @param intentFilter - filter to get registered fragments for
+     * @return - list of fragments registered to the specified filter
+     */
+    public List<BroadcastReceiverFragment> getFragmentsForFilter(String intentFilter) {
+        synchronized (filterMap) {
+            if (filterMap.containsKey(intentFilter)) {
+                Map<String, BroadcastReceiverFragment> fragmentMap = filterMap.get(intentFilter);
+
+                return new ArrayList<>(fragmentMap.values());
+            } else {
+                return new ArrayList<>();
+            }
+        }
+    }
+
+    /**
+     * Registers all the filters for the specified fragment.
+     *
+     * @param fragment - fragment to specify filters for.
+     */
+    public void registerForBroadcasts(BroadcastReceiverFragment fragment) {
+        Set<String> intentFilters = fragment.getIntentFilters();
+        for (String intentFilter : intentFilters) {
+            registerForSingleBroadcast(fragment, intentFilter);
+        }
+    }
+
+    /**
+     * Allows a BroadcastReceiverFragment to register for a single intent filter
+     *
+     * @param fragment     - fragment to register
+     * @param intentFilter - filter to register for the fragment
+     */
+    public void registerForSingleBroadcast(BroadcastReceiverFragment fragment, String intentFilter) {
+        String fragmentID = fragment.getFragmentID();
+        synchronized (filterMap) {
+            Map<String, BroadcastReceiverFragment> fragmentMap;
+            if (filterMap.containsKey(intentFilter)) {
+                fragmentMap = filterMap.get(intentFilter);
+                if (!fragmentMap.containsKey(fragmentID)) {
+                    fragmentMap.put(fragmentID, fragment);
+                    filterMap.put(intentFilter, fragmentMap);
                 }
-                s = new ArrayList(((Map)filterMap.get(s)).values());
+            } else {
+                fragmentMap = new HashMap<>();
+                fragmentMap.put(fragmentID, fragment);
+                filterMap.put(intentFilter, fragmentMap);
             }
-            return s;
         }
-        s = new ArrayList();
-        map;
-        JVM INSTR monitorexit ;
-        return s;
-        s;
-        map;
-        JVM INSTR monitorexit ;
-        throw s;
     }
 
-    public void registerForBroadcasts(BroadcastReceiverFragment broadcastreceiverfragment)
-    {
-        for (Iterator iterator = broadcastreceiverfragment.getIntentFilters().iterator(); iterator.hasNext(); registerForSingleBroadcast(broadcastreceiverfragment, (String)iterator.next())) { }
-    }
-
-    public void registerForSingleBroadcast(BroadcastReceiverFragment broadcastreceiverfragment, String s)
-    {
-        String s1 = broadcastreceiverfragment.getFragmentID();
-        Map map = filterMap;
-        map;
-        JVM INSTR monitorenter ;
-        if (!filterMap.containsKey(s))
-        {
-            break MISSING_BLOCK_LABEL_82;
-        }
-        Map map1 = (Map)filterMap.get(s);
-        if (!map1.containsKey(s1))
-        {
-            map1.put(s1, broadcastreceiverfragment);
-            filterMap.put(s, map1);
-        }
-_L2:
-        return;
-        HashMap hashmap = new HashMap();
-        hashmap.put(s1, broadcastreceiverfragment);
-        filterMap.put(s, hashmap);
-        if (true) goto _L2; else goto _L1
-_L1:
-        broadcastreceiverfragment;
-        map;
-        JVM INSTR monitorexit ;
-        throw broadcastreceiverfragment;
-    }
-
-    public void unRegisterForBroadcasts(String s)
-    {
-        Map map = filterMap;
-        map;
-        JVM INSTR monitorenter ;
-        Iterator iterator = filterMap.entrySet().iterator();
-        do
-        {
-            if (!iterator.hasNext())
-            {
-                break;
-            }
-            Object obj = (Map.Entry)iterator.next();
-            obj = (Map)filterMap.get(((Map.Entry) (obj)).getKey());
-            ((Map) (obj)).remove(s);
-            if (((Map) (obj)).isEmpty())
-            {
-                iterator.remove();
-            }
-        } while (true);
-        break MISSING_BLOCK_LABEL_96;
-        s;
-        map;
-        JVM INSTR monitorexit ;
-        throw s;
-        map;
-        JVM INSTR monitorexit ;
-    }
-
-    public void unRegisterForSingleBroadcast(String s, String s1)
-    {
-        synchronized (filterMap)
-        {
-            if (filterMap.containsKey(s1))
-            {
-                Map map1 = (Map)filterMap.get(s1);
-                map1.remove(s);
-                if (map1.isEmpty())
-                {
-                    filterMap.remove(s1);
+    /**
+     * Unregisters all intent filters for the given fragment id.
+     *
+     * @param id
+     */
+    public void unRegisterForBroadcasts(String id) {
+        synchronized (filterMap) {
+            Iterator<Map.Entry<String, Map<String, BroadcastReceiverFragment>>> iter = filterMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, Map<String, BroadcastReceiverFragment>> entry = iter.next();
+                Map<String, BroadcastReceiverFragment> fragmentMap = filterMap.get(entry.getKey());
+                fragmentMap.remove(id);
+                if (fragmentMap.isEmpty()) {
+                    iter.remove();
                 }
             }
         }
-        return;
-        s;
-        map;
-        JVM INSTR monitorexit ;
-        throw s;
+    }
+
+    /**
+     * Unregisters the specified intent filter for the given fragment id.
+     *
+     * @param id           - id of fragment to remove filter for
+     * @param intentFilter - filter to remove
+     */
+    public void unRegisterForSingleBroadcast(String id, String intentFilter) {
+        synchronized (filterMap) {
+            if (filterMap.containsKey(intentFilter)) {
+                Map<String, BroadcastReceiverFragment> fragmentMap = filterMap.get(intentFilter);
+                fragmentMap.remove(id);
+                if (fragmentMap.isEmpty()) {
+                    filterMap.remove(intentFilter);
+                }
+            }
+        }
     }
 }

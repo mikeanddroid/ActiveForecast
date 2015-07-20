@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="grey">#333333</color>
+    <color name="navigation_background_color">#DEDEDE</color>
+    <color name="navigation_background_cal_color">#333333</color>
+    <color name="home_background_color">#333333</color>
+    <color name="forecast_background_color">#333333</color>
+    
+    <color name="white">#fff</color>
+    <color name="white_70">#b2ffffff</color>
+    <color name="white_60">#99ffffff</color>
+    <color name="white_50">#80ffffff</color>
+    <color name="white_40">#8effffff</color>
+    <color name="white_30">#4cffffff</color>
+    <color name="white_20">#33ffffff</color>
+    <color name="black">#000</color>
+    <color name="transparent">#0fff</color>
+    <color name="action_bar_gray">#333333</color>
+    <color name="background_gray">#f5f5f5</color>
+    <color name="material_blue_500">#2196f3</color>
+
+    <color name="ttdPrimaryColor">#f95b2a</color>
+    <color name="ttdPrimaryColorTrans">#66f95b2a</color>
+
+    <color name="myDrawerBackground">#F2F2F2</color>
+    <color name="myWindowBackground">#DEDEDE</color>
+    <color name="myTextPrimaryColor">#FFFFFF</color>
+    <color name="myNavigationColor">#000000</color>
+
+    <color name="selected_gray">#ffdbdbdb</color>
+    <color name="divider">#ccc</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="light_white">#f3f3f3</color>
+    <color name="dark_grey">#333333</color>
+    <color name="medium_gray">#666666</color>
+    <color name="light_grey">#999999</color>
+    <color name="light_grey_20">#33999999</color>
+    <color name="dark_blue">#ff3b7090</color>
+    <color name="counter_text_bg">#626262</color>
+
+
+    <color name="dark_trans">#99212121</color>
+    <color name="light_trans">#3e212121</color>
+    <color name="darker_trans">#99050505</color>
+    
+    
+</resources>

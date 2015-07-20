@@ -19,10 +19,10 @@ import android.view.animation.Transformation;
 import com.mike.givemewingzz.activeforecast.R;
 import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastBridge;
 import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastReceiverFragment;
-import com.mike.givemewingzz.activeforecast.exceptions.ToolbarInteractionException;
-import com.mike.givemewingzz.activeforecast.navigationdrawer.CoreNavigationActivity;
-import com.mike.givemewingzz.activeforecast.navigationdrawer.NavigationHandler;
-import com.mike.givemewingzz.activeforecast.toolbar.utils.ToolbarOptions;
+import com.mike.givemewingzz.activeforecast.navigationframework.toolbarframework.exceptions.ToolbarInteractionException;
+import com.mike.givemewingzz.activeforecast.navigationframework.navigation.CoreNavigationActivity;
+import com.mike.givemewingzz.activeforecast.navigationframework.navigation.NavigationHandler;
+import com.mike.givemewingzz.activeforecast.navigationframework.toolbarframework.utils.ToolbarOptions;
 
 import java.util.HashSet;
 import java.util.Set;
