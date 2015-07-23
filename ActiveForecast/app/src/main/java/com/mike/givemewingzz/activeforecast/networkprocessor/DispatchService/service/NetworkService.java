@@ -245,6 +245,12 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
                         actualWeather.currentTempInCelsius = s;
                         actualWeather.currentTempInFarenheit = s1;
 
+                        String tempHumidity = actualWeather.humidity + "\u0025";
+                        String tempPressure = actualWeather.pressure + " hpa";
+
+                        actualWeather.humidity = tempHumidity;
+                        actualWeather.pressure = tempPressure;
+
                         actualWeather.save();
 
                     }
@@ -258,6 +264,8 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
                     for (int i = 0; i < windWeatherListJson.size(); i++) {
 
                         WindData windData = (WindData) windWeatherListJson.get(i);
+
+                        windData.windSpeed = windData.windSpeed + " m/s";
 
                         windData.save();
 

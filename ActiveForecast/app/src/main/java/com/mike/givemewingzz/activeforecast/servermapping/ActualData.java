@@ -21,7 +21,7 @@ public class ActualData extends WeatherModel {
 
     @Column(name = "Humidity")
     @PropMap(serverFieldName = "humidity")
-    public int humidity;
+    public String humidity;
 
     @Column(name = "MaxTemperature")
     @PropMap(serverFieldName = "temp_max")
@@ -33,6 +33,6 @@ public class ActualData extends WeatherModel {
 
     @Column(name = "Pressure")
     @PropMap(serverFieldName = "pressure")
-    public int pressure;
+    public String pressure;
 
 }

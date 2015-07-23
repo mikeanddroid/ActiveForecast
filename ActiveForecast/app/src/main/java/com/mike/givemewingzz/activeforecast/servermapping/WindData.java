@@ -13,6 +13,6 @@ public class WindData extends WeatherModel
 
     @Column(name = "WindSpeed")
     @PropMap(serverFieldName = "speed")
-    public double windSpeed;
+    public String windSpeed;
 
 }
