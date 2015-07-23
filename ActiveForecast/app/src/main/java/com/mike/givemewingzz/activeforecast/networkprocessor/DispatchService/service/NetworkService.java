@@ -17,9 +17,11 @@ import com.mike.givemewingzz.activeforecast.servermapping.ActualData;
 import com.mike.givemewingzz.activeforecast.servermapping.Coordinates;
 import com.mike.givemewingzz.activeforecast.servermapping.OtherData;
 import com.mike.givemewingzz.activeforecast.servermapping.Weather;
+import com.mike.givemewingzz.activeforecast.servermapping.WeatherModel;
 import com.mike.givemewingzz.activeforecast.servermapping.WindData;
 import com.mike.givemewingzz.activeforecast.utils.ApplicationUtils;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
@@ -28,6 +30,10 @@ import java.util.List;
 public class NetworkService extends Service implements ServiceTimeoutTimer.ServiceCancelBroadcaster {
 
     public static final String TAG = NetworkService.class.getSimpleName();
+
+    private ThreadTaskQueue networkRequestQueue;
+    private ThreadTaskQueue networkResponseQueue;
+
     /**
      * TimerTask interface instance for canceling service.
      *
@@ -35,8 +41,7 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
      */
     private ServiceTimeoutTimer currentServiceTimeout;
     private DecimalFormat format;
-    private ThreadTaskQueue networkRequestQueue;
-    private ThreadTaskQueue networkResponseQueue;
+
     /**
      * Time representing last call into this service.
      *
@@ -44,8 +49,7 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
      */
     private long serviceTimeMilliseconds;
 
-    private long serviceTimeOut = 120000L;
-    ;
+    private long serviceTimeOut = ServiceTimeoutTimer.SERVICE_TWO_MINUTES_TIMEOUT;
 
     public int onStartCommand(Intent intent, int flag, int startId) {
 
@@ -83,6 +87,7 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
         return START_NOT_STICKY;
     }
 
+    @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
@@ -124,7 +129,7 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
 
     public void handleNetworkResponse(ResponseObject responseobject) {
 
-        Log.i(TAG, "handleNetworkResponse   ");
+        Log.i(TAG, "handleNetworkResponse");
         if (networkResponseQueue == null) {
             networkResponseQueue = new ThreadTaskQueue();
         }
@@ -190,126 +195,105 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
 
     }
 
-    public void processCurrentData(ResponseObject responseObject) {
-        Log.i(TAG, (new StringBuilder()).append("Process Current Data ").append(responseObject).toString());
-        if (responseObject != null) {
+    public void processCurrentData(ResponseObject responseobject) {
+        Log.i(TAG, (new StringBuilder()).append("Process Current Data ").append(responseobject).toString());
+        if (responseobject != null) {
 
             boolean isSuccess = false;
 
             format = new DecimalFormat();
             format.setDecimalSeparatorAlwaysShown(false);
 
-            if (responseObject.getCode() == ResponseObject.SUCCESS) {
+            if (responseobject.getCode() == ResponseObject.SUCCESS) {
 
                 try {
 
+                    JSONObject actualWeatherJson = responseobject.getJsonObject().getJSONObject("main");
+                    JSONObject coordinatesJson = responseobject.getJsonObject().getJSONObject("coord");
+                    JSONObject windJson = responseobject.getJsonObject().getJSONObject("wind");
+                    JSONObject sysJson = responseobject.getJsonObject().getJSONObject("sys");
+
+                    JSONArray weatherJsonArray = responseobject.getJsonObject().getJSONArray("weather");
+
+                    List<WeatherModel> actualListWeatherJson = ActualData.createFromJSONObject(ActualData.class, actualWeatherJson);
+                    List<WeatherModel> coordinatesListWeatherJson = Coordinates.createFromJSONObject(Coordinates.class, coordinatesJson);
+                    List<WeatherModel> windWeatherListJson = WindData.createFromJSONObject(WindData.class, windJson);
+                    List<WeatherModel> sysWeatherListJson = OtherData.createFromJSONObject(OtherData.class, sysJson);
+                    List<WeatherModel> weatherListWeatherJson = Weather.createFromJSONList(Weather.class, weatherJsonArray);
 
 
+                    Log.d(TAG, "Beginning ActualData transaction");
+                    ActiveAndroid.beginTransaction();
+
+                    new Delete().from(ActualData.class).execute();
+                    new Delete().from(Coordinates.class).execute();
+                    new Delete().from(OtherData.class).execute();
+                    new Delete().from(WindData.class).execute();
+                    new Delete().from(Weather.class).execute();
+
+                    for (int i = 0; i < actualListWeatherJson.size(); i++) {
+
+                        ActualData actualWeather = (ActualData) actualListWeatherJson.get(i);
+
+                        String s = (new StringBuilder()).append(Math.round(Double.valueOf(actualWeather.currentTemp).doubleValue() - 273.14999999999998D)).append("\260").append("C").toString();
+                        String s1 = (new StringBuilder()).append(Math.round((Double.valueOf(actualWeather.currentTemp).doubleValue() * 9D) / 5D - 459.67000000000002D)).append("\260").append("F").toString();
+                        actualWeather.currentTempInCelsius = s;
+                        actualWeather.currentTempInFarenheit = s1;
+
+                        actualWeather.save();
+
+                    }
+                    for (int i = 0; i < coordinatesListWeatherJson.size(); i++) {
+
+                        Coordinates coordinates = (Coordinates) coordinatesListWeatherJson.get(i);
+
+                        coordinates.save();
+
+                    }
+                    for (int i = 0; i < windWeatherListJson.size(); i++) {
+
+                        WindData windData = (WindData) windWeatherListJson.get(i);
+
+                        windData.save();
+
+                    }
+                    for (int i = 0; i < sysWeatherListJson.size(); i++) {
+
+                        OtherData otherData = (OtherData) sysWeatherListJson.get(i);
+
+                        otherData.sunrise = otherData.sunrise * 1000L;
+                        otherData.sunset = otherData.sunset * 1000L;
+
+                        otherData.save();
+
+                    }
+                    for (int i = 0; i < weatherListWeatherJson.size(); i++) {
+
+                        Weather weather = (Weather) weatherListWeatherJson.get(i);
+
+                        weather.save();
+
+                    }
+
+                    ActiveAndroid.setTransactionSuccessful();
+                    Log.d(TAG, "CurrentWeather transaction Success");
+
+                    isSuccess = true;
 
                 } catch (Exception e) {
                     isSuccess = false;
                     Log.e(TAG, "processBestLists failed " + e, e);
                 } finally {
                     ActiveAndroid.endTransaction();
-                    sendLocalBroadcast(isSuccess, responseObject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
+                    sendLocalBroadcast(isSuccess, responseobject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
                 }
 
+            } else {
+                sendLocalBroadcast(isSuccess, responseobject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
             }
 
         }
-        Object obj;
-        Object obj2;
-        Object obj3;
-        Object obj4;
-        Object obj5;
-        obj = responseobject.getJsonObject().getJSONObject("main");
-        obj2 = responseobject.getJsonObject().getJSONObject("coord");
-        obj4 = responseobject.getJsonObject().getJSONObject("wind");
-        obj3 = responseobject.getJsonObject().getJSONObject("sys");
-        obj5 = responseobject.getJsonObject().getJSONArray("weather");
-        obj = ActualData.createFromJSONObject(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / ActualData, ((JSONObject) (obj)));
-        obj2 = Coordinates.createFromJSONObject(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / Coordinates, ((JSONObject) (obj2)));
-        obj3 = OtherData.createFromJSONObject(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / OtherData, ((JSONObject) (obj3)));
-        obj4 = WindData.createFromJSONObject(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / WindData, ((JSONObject) (obj4)));
-        obj5 = Weather.createFromJSONList(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / Weather, ((org.json.JSONArray) (obj5)));
-        Log.d(TAG, "Beginning ActualData transaction");
-        ActiveAndroid.beginTransaction();
-        (new Delete()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / ActualData).execute();
-        (new Delete()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / Coordinates).execute();
-        (new Delete()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / OtherData).execute();
-        (new Delete()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / WindData).execute();
-        (new Delete()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / Weather).execute();
-        int i = 0;
-        _L6:
-        if (i >= ((List) (obj)).size()) {
-            break; /* Loop/switch isn't completed */
-        }
-        ActualData actualdata = (ActualData) ((List) (obj)).get(i);
-        String s = (new StringBuilder()).append(Math.round(Double.valueOf(actualdata.currentTemp).doubleValue() - 273.14999999999998D)).append("\260").append("C").toString();
-        String s1 = (new StringBuilder()).append(Math.round((Double.valueOf(actualdata.currentTemp).doubleValue() * 9D) / 5D - 459.67000000000002D)).append("\260").append("F").toString();
-        actualdata.currentTempInCelsius = s;
-        actualdata.currentTempInFarenheit = s1;
-        actualdata.save();
-        i++;
-        if (true)goto _L6;else goto _L5
-        _L9:
-        if (i >= ((List) (obj2)).size())goto _L8;else goto _L7
-        _L7:
-        ((Coordinates) ((List) (obj2)).get(i)).save();
-        i++;
-        goto _L9
-        _L10:
-        if (i >= ((List) (obj3)).size()) {
-            break MISSING_BLOCK_LABEL_689;
-        }
-        OtherData otherdata = (OtherData) ((List) (obj3)).get(i);
-        otherdata.sunrise = otherdata.sunrise * 1000L;
-        otherdata.sunset = otherdata.sunset * 1000L;
-        otherdata.save();
-        i++;
-        goto _L10
-        _L11:
-        if (i >= ((List) (obj4)).size()) {
-            break MISSING_BLOCK_LABEL_695;
-        }
-        ((WindData) ((List) (obj4)).get(i)).save();
-        i++;
-        goto _L11
-        _L12:
-        Object obj1;
-        for (; i >= ((List) (obj5)).size(); i = 0) {
-            break MISSING_BLOCK_LABEL_585;
-        }
 
-        ((Weather) ((List) (obj5)).get(i)).save();
-        i++;
-        goto _L12
-        ActiveAndroid.setTransactionSuccessful();
-        Log.d(TAG, "CurrentWeather transaction Success");
-        ActiveAndroid.endTransaction();
-        sendLocalBroadcast(true, responseobject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
-        _L2:
-        return;
-        obj1;
-        Log.e(TAG, "Process Current Data failed ", ((Throwable) (obj1)));
-        ActiveAndroid.endTransaction();
-        sendLocalBroadcast(false, responseobject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
-        return;
-        obj1;
-        ActiveAndroid.endTransaction();
-        sendLocalBroadcast(false, responseobject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
-        throw obj1;
-        _L4:
-        sendLocalBroadcast(false, responseobject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
-        return;
-        _L5:
-        i = 0;
-        goto _L9
-        _L8:
-        i = 0;
-        goto _L10
-                i = 0;
-        goto _L11
     }
 
     private void sendLocalBroadcast(boolean flag, String s, Bundle bundle) {
@@ -320,8 +304,9 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    public void sendCancelBroadcast(String s, int i, long l) {
-        if (serviceTimeMilliseconds == l) {
+    @Override
+    public void sendCancelBroadcast(String action, int taskType, long timeInitiatied) {
+        if (this.serviceTimeMilliseconds == timeInitiatied) {
             stopSelf();
         }
     }
