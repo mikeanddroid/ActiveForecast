@@ -15,6 +15,7 @@ import com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.exc
 import com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.exceptions.NetworkServiceException;
 import com.mike.givemewingzz.activeforecast.servermapping.ActualData;
 import com.mike.givemewingzz.activeforecast.servermapping.Coordinates;
+import com.mike.givemewingzz.activeforecast.servermapping.CurrentWeather;
 import com.mike.givemewingzz.activeforecast.servermapping.OtherData;
 import com.mike.givemewingzz.activeforecast.servermapping.Weather;
 import com.mike.givemewingzz.activeforecast.servermapping.WeatherModel;
@@ -215,6 +216,10 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
 
                     JSONArray weatherJsonArray = responseobject.getJsonObject().getJSONArray("weather");
 
+                    JSONObject currentWeatherJsonObject = responseobject.getJsonObject();
+
+                    List<WeatherModel> currentWeatherJson = CurrentWeather.createFromJSONObject(CurrentWeather.class, currentWeatherJsonObject);
+
                     List<WeatherModel> actualListWeatherJson = ActualData.createFromJSONObject(ActualData.class, actualWeatherJson);
                     List<WeatherModel> coordinatesListWeatherJson = Coordinates.createFromJSONObject(Coordinates.class, coordinatesJson);
                     List<WeatherModel> windWeatherListJson = WindData.createFromJSONObject(WindData.class, windJson);
@@ -229,6 +234,7 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
                     new Delete().from(OtherData.class).execute();
                     new Delete().from(WindData.class).execute();
                     new Delete().from(Weather.class).execute();
+                    new Delete().from(CurrentWeather.class).execute();
 
                     for (int i = 0; i < actualListWeatherJson.size(); i++) {
 
@@ -271,6 +277,13 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
                         Weather weather = (Weather) weatherListWeatherJson.get(i);
 
                         weather.save();
+
+                    }
+                    for (int i = 0; i < currentWeatherJson.size(); i++) {
+
+                        CurrentWeather currentWeather = (CurrentWeather) currentWeatherJson.get(i);
+
+                        currentWeather.save();
 
                     }
 

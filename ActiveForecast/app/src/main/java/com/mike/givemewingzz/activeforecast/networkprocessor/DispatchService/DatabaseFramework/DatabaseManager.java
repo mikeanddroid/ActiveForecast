@@ -9,6 +9,7 @@ import com.activeandroid.Model;
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 import com.mike.givemewingzz.activeforecast.servermapping.ActualData;
+import com.mike.givemewingzz.activeforecast.servermapping.Coordinates;
 import com.mike.givemewingzz.activeforecast.servermapping.CurrentWeather;
 import com.mike.givemewingzz.activeforecast.servermapping.OtherData;
 import com.mike.givemewingzz.activeforecast.servermapping.Weather;
@@ -67,14 +68,15 @@ public class DatabaseManager {
 
         Log.d(TAG, "Inside fetchCurrentWeather");
 
-        From actualFrom = (new Select()).from(ActualData.class);
-        From currentFrom = (new Select()).from(CurrentWeather.class);
-        From weatherFrom = (new Select()).from(Weather.class);
-        From windFrom = (new Select()).from(WindData.class);
-        From dataFrom = (new Select()).from(OtherData.class);
+        From actualFrom = new Select().from(ActualData.class);
+        From currentFrom = new Select().from(CurrentWeather.class);
+        From weatherFrom = new Select().from(Weather.class);
+        From windFrom = new Select().from(WindData.class);
+        From dataFrom = new Select().from(OtherData.class);
+        From coordinatesFrom = new Select().from(Coordinates.class);
 
         AsyncResponseTask asyncTask = new AsyncResponseTask(asyncresponselistener);
-        asyncTask.execute(actualFrom, currentFrom, weatherFrom, windFrom, dataFrom);
+        asyncTask.execute(actualFrom, currentFrom, weatherFrom, windFrom, dataFrom, coordinatesFrom);
 
         return asyncTask;
     }
@@ -95,18 +97,21 @@ public class DatabaseManager {
             List<Model> sysList = new ArrayList<>();
             List<Model> weatherList = new ArrayList<>();
             List<Model> windList = new ArrayList<>();
+            List<Model> coordinatesList = new ArrayList<>();
 
             List<ActualData> actualDataList = new ArrayList<>();
             List<CurrentWeather> currentDataList = new ArrayList<>();
-            List<OtherData> sysDataList = new ArrayList<>();
             List<Weather> weatherDataList = new ArrayList<>();
             List<WindData> windDataList = new ArrayList<>();
+            List<OtherData> sysDataList = new ArrayList<>();
+            List<Coordinates> coordinatesDataList = new ArrayList<>();
 
             actualList.addAll(params[0].execute());
             currentList.addAll(params[1].execute());
             weatherList.addAll(params[2].execute());
             windList.addAll(params[3].execute());
             sysList.addAll(params[4].execute());
+            coordinatesList.addAll(params[5].execute());
 
             List<WrapperClass> completeList = new ArrayList<>();
 
@@ -157,11 +162,20 @@ public class DatabaseManager {
                     windDataList.add((WindData) model);
                 }
 
+                for (Model model : coordinatesList) {
+
+                    WrapperClass wrapperClass = new WrapperClass(model, WrapperClass.COORDINATES_DATA_WEATHER);
+
+                    completeList.add(wrapperClass);
+
+                    coordinatesDataList.add((Coordinates) model);
+                }
+
             } catch (Exception e) {
                 Log.e(TAG, "Array out of bounds.", e);
             }
 
-            return new AsyncResponse(completeList, actualDataList, currentDataList, sysDataList, weatherDataList, windDataList);
+            return new AsyncResponse(completeList, actualDataList, currentDataList, sysDataList, weatherDataList, windDataList, coordinatesDataList);
 
         }
 
@@ -184,10 +198,18 @@ public class DatabaseManager {
         public List<OtherData> sysDataList;
         public List<Weather> weatherDataList;
         public List<WindData> windDataList;
+        public List<Coordinates> coordinatesDataList;
 
         public List<WrapperClass> completeList;
 
-        public AsyncResponse(List<WrapperClass> completeList, List<ActualData> actualDataList, List<CurrentWeather> currentDataList, List<OtherData> sysDataList, List<Weather> weatherDataList, List<WindData> windDataList) {
+        public AsyncResponse(
+                List<WrapperClass> completeList,
+                List<ActualData> actualDataList,
+                List<CurrentWeather> currentDataList,
+                List<OtherData> sysDataList,
+                List<Weather> weatherDataList,
+                List<WindData> windDataList,
+                List<Coordinates> coordinatesDataList) {
 
             this.completeList = completeList;
             this.actualDataList = actualDataList;
@@ -195,6 +217,7 @@ public class DatabaseManager {
             this.sysDataList = sysDataList;
             this.weatherDataList = weatherDataList;
             this.windDataList = windDataList;
+            this.coordinatesDataList = coordinatesDataList;
 
         }
     }

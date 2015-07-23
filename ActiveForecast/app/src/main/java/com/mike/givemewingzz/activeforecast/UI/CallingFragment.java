@@ -20,10 +20,16 @@ import com.mike.givemewingzz.activeforecast.navigationframework.toolbar.ToolbarO
 import com.mike.givemewingzz.activeforecast.navigationframework.toolbarframework.exceptions.ToolbarInteractionException;
 import com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.DatabaseFramework.DatabaseManager;
 import com.mike.givemewingzz.activeforecast.servermapping.ActualData;
+import com.mike.givemewingzz.activeforecast.servermapping.CurrentWeather;
+import com.mike.givemewingzz.activeforecast.servermapping.OtherData;
+import com.mike.givemewingzz.activeforecast.servermapping.Weather;
+import com.mike.givemewingzz.activeforecast.servermapping.WindData;
 import com.mike.givemewingzz.activeforecast.utils.ApplicationUtils;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,10 +44,18 @@ public class CallingFragment extends CoreFragment implements BroadcastReceiverFr
     private FragmentTransactionHandler fragmentTransactionHandler;
 
     private List<ActualData> actualDataList;
+    List<CurrentWeather> currentDataList;
+    List<OtherData> sysDataList;
+    List<Weather> weatherDataList;
+    List<WindData> windDataList;
 
     public CallingFragment() {
 
         actualDataList = new ArrayList<>();
+        weatherDataList = new ArrayList();
+        sysDataList = new ArrayList();
+        windDataList = new ArrayList();
+        currentDataList = new ArrayList();
 
     }
 
@@ -151,8 +165,6 @@ public class CallingFragment extends CoreFragment implements BroadcastReceiverFr
                     maxTemp = cursor.getString(cursor.getColumnIndexOrThrow("MaxTemperature"));
                 }
 
-                Log.d(TAG, (new StringBuilder()).append("Max Temp : ").append(maxTemp).toString());
-
                 break;
 
 
@@ -184,14 +196,74 @@ public class CallingFragment extends CoreFragment implements BroadcastReceiverFr
                 .append("Inside onRequestComplete. Response Size : Actual Data Size : ")
                 .append(asyncresponse.actualDataList.size()).toString());
 
-        if (actualDataList != null)
-        {
+        if (actualDataList != null) {
             actualDataList.clear();
             actualDataList.addAll(asyncresponse.actualDataList);
-            for (int j = 0; j < asyncresponse.actualDataList.size(); j++)
-            {
-                Log.d(TAG, (new StringBuilder()).append("Actual Data List Current Temp : ").append(((ActualData)actualDataList.get(j)).currentTempInCelsius).toString());
-                Log.d(TAG, (new StringBuilder()).append("Actual Data List Current Temp in Farenheit: ").append(((ActualData)actualDataList.get(j)).currentTempInFarenheit).toString());
+            for (int j = 0; j < asyncresponse.actualDataList.size(); j++) {
+
+                Log.d(TAG, "Actual Data List Current Temp : " + actualDataList.get(j).currentTempInCelsius);
+                Log.d(TAG, "Actual Data List Current Temp in Farenheit : " + actualDataList.get(j).currentTempInFarenheit);
+                Log.d(TAG,"Actual Data List Humidity : "+ actualDataList.get(j).humidity);
+                Log.d(TAG,"Actual Data List Pressure : "+ actualDataList.get(j).pressure);
+                Log.d(TAG,"Actual Data List Current Temp : "+ actualDataList.get(j).currentTemp);
+                Log.d(TAG,"Actual Data List Max Temp : "+ actualDataList.get(j).maxTemp);
+                Log.d(TAG,"Actual Data List Min Temp : "+ actualDataList.get(j).minTemp);
+
+            }
+        }
+
+        if (currentDataList != null) {
+            currentDataList.clear();
+            currentDataList.addAll(asyncresponse.currentDataList);
+            for (int k = 0; k < asyncresponse.currentDataList.size(); k++) {
+
+                Log.d(TAG, "Current Data List City : " + currentDataList.get(k).cityName);
+                Log.d(TAG, "Current Data WeatherBase : " + currentDataList.get(k).weatherBase);
+                Log.d(TAG, "Current Data WeatherDate : "+ currentDataList.get(k).weatherDate);
+                Log.d(TAG, "Current Data WeatherID : "+ currentDataList.get(k).weatherID);
+
+            }
+
+        }
+        if (weatherDataList != null) {
+            weatherDataList.clear();
+            weatherDataList.addAll(asyncresponse.weatherDataList);
+            for (int l = 0; l < asyncresponse.weatherDataList.size(); l++) {
+
+                Log.d(TAG, "Weather Data List Weather Desc : " + weatherDataList.get(l).weatherDescription);
+                Log.d(TAG, "Weather Data List Weather Condition : " + weatherDataList.get(l).weatherCondition);
+                Log.d(TAG, "Weather Data List Weather Icon : "+ weatherDataList.get(l).weatherIcon);
+                Log.d(TAG, "Weather Data List Weather ICON ID : "+ weatherDataList.get(l).iconID);
+
+            }
+
+        }
+        if (windDataList != null) {
+            windDataList.clear();
+            windDataList.addAll(asyncresponse.windDataList);
+            for (int i1 = 0; i1 < asyncresponse.windDataList.size(); i1++) {
+
+                Log.d(TAG, "Wind Data List WindSpeed : " + windDataList.get(i1).windSpeed);
+                Log.d(TAG, "Wind Data List WindDegree : " + windDataList.get(i1).windDegree);
+
+            }
+
+        }
+        if (sysDataList != null) {
+            sysDataList.clear();
+            sysDataList.addAll(asyncresponse.sysDataList);
+            DateFormat dateformat = DateFormat.getDateTimeInstance();
+            for (int j1 = 0; j1 < asyncresponse.sysDataList.size(); j1++) {
+                String sunrise = dateformat.format(new Date(sysDataList.get(j1).sunrise));
+                String sunset = dateformat.format(new Date(sysDataList.get(j1).sunset));
+
+                Log.d(TAG, "Other Data List Sunrise : " + sunrise);
+                Log.d(TAG, "Other Data List Sunset : " + sunset);
+                Log.d(TAG, "Other Data List Country : " + sysDataList.get(j1).country);
+                Log.d(TAG, "Other Data List Message : " + sysDataList.get(j1).message);
+                Log.d(TAG, "Other Data List Type : " + sysDataList.get(j1).type);
+                Log.d(TAG, "Other Data List ID : " + sysDataList.get(j1).id);
+
             }
 
         }
@@ -202,13 +274,10 @@ public class CallingFragment extends CoreFragment implements BroadcastReceiverFr
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
 
             case R.id.calldispatch:
                 CoreApplication.getInstance().getRequestDispatch().requestCurrentWeatherData(false, "20770");
-
-                Log.d(TAG,"Whatever");
-
                 break;
 
         }
