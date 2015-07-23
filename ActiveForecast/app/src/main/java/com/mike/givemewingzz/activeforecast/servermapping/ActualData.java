@@ -4,9 +4,8 @@ package com.mike.givemewingzz.activeforecast.servermapping;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
-@Table(name="ActualData")
-public class ActualData extends WeatherModel
-{
+@Table(name = "ActualData")
+public class ActualData extends WeatherModel {
 
     @Column(name = "CurrentTemperature")
     @PropMap(serverFieldName = "temp")

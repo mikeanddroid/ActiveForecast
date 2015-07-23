@@ -16,141 +16,18 @@ import com.mike.givemewingzz.activeforecast.servermapping.WindData;
 import com.mike.givemewingzz.activeforecast.servermapping.WrapperClass;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Helper class to consolidate database cursor access.  Calls for cursor data should come through
+ * this class which should only be accessed via the base application.
+ */
 public class DatabaseManager {
-    public class AsyncResponse {
 
-        public List actualDataList;
-        public List currentDataList;
-        public List responseData;
-        public List sysDataList;
-        final DatabaseManager this$0;
-        public List weatherDataList;
-        public List windDataList;
-
-        public AsyncResponse(List list, List list1, List list2, List list3, List list4, List list5) {
-            this$0 = DatabaseManager.this;
-            super();
-            responseData = list;
-            actualDataList = list1;
-            currentDataList = list2;
-            weatherDataList = list3;
-            windDataList = list4;
-            sysDataList = list5;
-        }
-    }
-
-    public static interface AsyncResponseListener {
-
-        public abstract void onRequestComplete(AsyncResponse asyncresponse);
-    }
-
-    public class AsyncResponseTask extends AsyncTask {
-
-        private AsyncResponseListener asyncResponseListener;
-        final DatabaseManager this$0;
-
-        protected transient AsyncResponse doInBackground(From afrom[]) {
-            ArrayList arraylist;
-            ArrayList arraylist1;
-            ArrayList arraylist2;
-            ArrayList arraylist3;
-            ArrayList arraylist4;
-            Object obj;
-            Object obj1;
-            Object obj2;
-            Object obj3;
-            Object obj4;
-            obj4 = new ArrayList();
-            obj3 = new ArrayList();
-            obj2 = new ArrayList();
-            obj1 = new ArrayList();
-            obj = new ArrayList();
-            ((List) (obj4)).addAll(afrom[0].execute());
-            ((List) (obj3)).addAll(afrom[1].execute());
-            ((List) (obj2)).addAll(afrom[2].execute());
-            ((List) (obj1)).addAll(afrom[3].execute());
-            ((List) (obj)).addAll(afrom[4].execute());
-            afrom = new ArrayList();
-            arraylist = new ArrayList();
-            arraylist1 = new ArrayList();
-            arraylist2 = new ArrayList();
-            arraylist3 = new ArrayList();
-            arraylist4 = new ArrayList();
-            Model model4;
-            for (obj4 = ((List) (obj4)).iterator(); ((Iterator) (obj4)).hasNext(); afrom.add((ActualData) model4)) {
-                model4 = (Model) ((Iterator) (obj4)).next();
-                arraylist4.add(new WrapperClass(model4, 1));
-            }
-
-            goto _L1
-            _L3:
-            return new AsyncResponse(arraylist4, afrom, arraylist, arraylist1, arraylist2, arraylist3);
-            _L1:
-            Model model3;
-            for (obj3 = ((List) (obj3)).iterator(); ((Iterator) (obj3)).hasNext(); arraylist.add((CurrentWeather) model3)) {
-                model3 = (Model) ((Iterator) (obj3)).next();
-                arraylist4.add(new WrapperClass(model3, 2));
-            }
-
-            Model model2;
-            for (obj2 = ((List) (obj2)).iterator(); ((Iterator) (obj2)).hasNext(); arraylist1.add((Weather) model2)) {
-                model2 = (Model) ((Iterator) (obj2)).next();
-                arraylist4.add(new WrapperClass(model2, 3));
-            }
-
-            Model model1;
-            for (obj1 = ((List) (obj1)).iterator(); ((Iterator) (obj1)).hasNext(); arraylist2.add((WindData) model1)) {
-                model1 = (Model) ((Iterator) (obj1)).next();
-                arraylist4.add(new WrapperClass(model1, 4));
-            }
-
-            try {
-                obj = ((List) (obj)).iterator();
-                while (((Iterator) (obj)).hasNext()) {
-                    Model model = (Model) ((Iterator) (obj)).next();
-                    arraylist4.add(new WrapperClass(model, 5));
-                    arraylist3.add((OtherData) model);
-                }
-            }
-            // Misplaced declaration of an exception variable
-            catch (Object obj) {
-                Log.e(DatabaseManager.TAG, "Error setting the list.", ((Throwable) (obj)));
-            }
-            if (true)goto _L3;else goto _L2
-            _L2:
-        }
-
-        protected volatile Object doInBackground(Object aobj[]) {
-            return doInBackground((From[]) aobj);
-        }
-
-        protected void onPostExecute(AsyncResponse asyncresponse) {
-            asyncResponseListener.onRequestComplete(asyncresponse);
-        }
-
-        protected volatile void onPostExecute(Object obj) {
-            onPostExecute((AsyncResponse) obj);
-        }
-
-        public AsyncResponseTask(AsyncResponseListener asyncresponselistener) {
-            this$0 = DatabaseManager.this;
-            super();
-            asyncResponseListener = asyncresponselistener;
-        }
-    }
-
-
-    private static final String TAG = com / example / givemewingz / activeforecast / mike / services / DatabaseManager.getSimpleName();
+    private static final String TAG = DatabaseManager.class.getSimpleName();
     private static DatabaseManager instance;
 
     private DatabaseManager() {
-    }
-
-    private Cursor executeQueryForCursor(String s) {
-        return Cache.openDatabase().rawQuery(s, null);
     }
 
     public static DatabaseManager getInstance() {
@@ -160,41 +37,175 @@ public class DatabaseManager {
         return instance;
     }
 
-    private String getTableName(Class class1) {
-        return Cache.getTableInfo(class1).getTableName();
+    /**
+     * Base cursor method which will return all model objects for the provided model class.
+     *
+     * @param modelClass - class to retrieve models from
+     * @return - a cursor to the model data
+     */
+    public Cursor fetchGenericCursor(Class<? extends Model> modelClass) {
+
+        String tableName = getTableName(modelClass);
+
+        String query = new Select(tableName + ".*, " + tableName + ".Id as _id").
+                from(modelClass).toSql();
+
+        return executeQueryForCursor(query);
     }
 
-    public ArrayList addListOf(List list) {
-        return new ArrayList();
-    }
 
     public Cursor fetchActualDataCursor() {
-        String s = getTableName(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / ActualData);
-        s = (new Select(new String[]{
-                (new StringBuilder()).append(s).append(".*, ").append(s).append(".Id as _id").toString()
-        })).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / ActualData).toSql();
-        return Cache.openDatabase().rawQuery(s, null);
+        String tableName = getTableName(ActualData.class);
+
+        String query = new Select(tableName + ".*, " + tableName + ".Id as _id").from(ActualData.class).toSql();
+
+        // Execute query on the underlying ActiveAndroid SQLite database
+        return Cache.openDatabase().rawQuery(query, null);
     }
 
     public AsyncResponseTask fetchCurrentWeather(AsyncResponseListener asyncresponselistener) {
+
         Log.d(TAG, "Inside fetchCurrentWeather");
-        getTableName(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / CurrentWeather);
-        getTableName(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / ActualData);
-        getTableName(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / Weather);
-        getTableName(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / WindData);
-        getTableName(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / OtherData);
-        getTableName(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / Coordinates);
-        From from = (new Select()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / ActualData);
-        From from1 = (new Select()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / CurrentWeather);
-        From from2 = (new Select()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / Weather);
-        From from3 = (new Select()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / WindData);
-        From from4 = (new Select()).from(com / example / givemewingz / activeforecast / mike / application / servermapping / data / objects / currentweather / OtherData);
-        asyncresponselistener = new AsyncResponseTask(asyncresponselistener);
-        asyncresponselistener.execute(new From[]{
-                from, from1, from2, from3, from4
-        });
-        return asyncresponselistener;
+
+        From actualFrom = (new Select()).from(ActualData.class);
+        From currentFrom = (new Select()).from(CurrentWeather.class);
+        From weatherFrom = (new Select()).from(Weather.class);
+        From windFrom = (new Select()).from(WindData.class);
+        From dataFrom = (new Select()).from(OtherData.class);
+
+        AsyncResponseTask asyncTask = new AsyncResponseTask(asyncresponselistener);
+        asyncTask.execute(actualFrom, currentFrom, weatherFrom, windFrom, dataFrom);
+
+        return asyncTask;
     }
 
+    public class AsyncResponseTask extends AsyncTask<From, Integer, AsyncResponse> {
+
+        private AsyncResponseListener asyncResponseListener;
+
+        public AsyncResponseTask(AsyncResponseListener asyncresponselistener) {
+            asyncResponseListener = asyncresponselistener;
+        }
+
+        @Override
+        protected AsyncResponse doInBackground(From... params) {
+
+            List<Model> actualList = new ArrayList<>();
+            List<Model> currentList = new ArrayList<>();
+            List<Model> sysList = new ArrayList<>();
+            List<Model> weatherList = new ArrayList<>();
+            List<Model> windList = new ArrayList<>();
+
+            List<ActualData> actualDataList = new ArrayList<>();
+            List<CurrentWeather> currentDataList = new ArrayList<>();
+            List<OtherData> sysDataList = new ArrayList<>();
+            List<Weather> weatherDataList = new ArrayList<>();
+            List<WindData> windDataList = new ArrayList<>();
+
+            actualList.addAll(params[0].execute());
+            currentList.addAll(params[1].execute());
+            weatherList.addAll(params[2].execute());
+            windList.addAll(params[3].execute());
+            sysList.addAll(params[4].execute());
+
+            List<WrapperClass> completeList = new ArrayList<>();
+
+            try {
+
+                for (Model model : actualList) {
+
+                    WrapperClass wrapperClass = new WrapperClass(model, WrapperClass.ACTUAL_DATA_WEATHER);
+
+                    completeList.add(wrapperClass);
+
+                    actualDataList.add((ActualData) model);
+                }
+
+                for (Model model : currentList) {
+
+                    WrapperClass wrapperClass = new WrapperClass(model, WrapperClass.CURRENT_DATA_WEATHER);
+
+                    completeList.add(wrapperClass);
+
+                    currentDataList.add((CurrentWeather) model);
+                }
+
+                for (Model model : sysList) {
+
+                    WrapperClass wrapperClass = new WrapperClass(model, WrapperClass.OTHER_DATA_WEATHER);
+
+                    completeList.add(wrapperClass);
+
+                    sysDataList.add((OtherData) model);
+                }
+
+                for (Model model : weatherList) {
+
+                    WrapperClass wrapperClass = new WrapperClass(model, WrapperClass.WEATHER_DATA_WEATHER);
+
+                    completeList.add(wrapperClass);
+
+                    weatherDataList.add((Weather) model);
+                }
+
+                for (Model model : windList) {
+
+                    WrapperClass wrapperClass = new WrapperClass(model, WrapperClass.WIND_DATA_WEATHER);
+
+                    completeList.add(wrapperClass);
+
+                    windDataList.add((WindData) model);
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, "Array out of bounds.", e);
+            }
+
+            return new AsyncResponse(completeList, actualDataList, currentDataList, sysDataList, weatherDataList, windDataList);
+
+        }
+
+        @Override
+        protected void onPostExecute(AsyncResponse asyncresponse) {
+            asyncResponseListener.onRequestComplete(asyncresponse);
+        }
+
+    }
+
+    public interface AsyncResponseListener {
+
+        void onRequestComplete(AsyncResponse asyncresponse);
+    }
+
+    public class AsyncResponse {
+
+        public List<ActualData> actualDataList;
+        public List<CurrentWeather> currentDataList;
+        public List<OtherData> sysDataList;
+        public List<Weather> weatherDataList;
+        public List<WindData> windDataList;
+
+        public List<WrapperClass> completeList;
+
+        public AsyncResponse(List<WrapperClass> completeList, List<ActualData> actualDataList, List<CurrentWeather> currentDataList, List<OtherData> sysDataList, List<Weather> weatherDataList, List<WindData> windDataList) {
+
+            this.completeList = completeList;
+            this.actualDataList = actualDataList;
+            this.currentDataList = currentDataList;
+            this.sysDataList = sysDataList;
+            this.weatherDataList = weatherDataList;
+            this.windDataList = windDataList;
+
+        }
+    }
+
+    private Cursor executeQueryForCursor(String s) {
+        return Cache.openDatabase().rawQuery(s, null);
+    }
+
+
+    private String getTableName(Class class1) {
+        return Cache.getTableInfo(class1).getTableName();
+    }
 
 }

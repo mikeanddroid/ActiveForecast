@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="mapPinBackground" format="reference" />
+    <declare-styleable name="ExpandableTextView">
+        <attr name="maxCollapsedLines" format="integer" />
+        <attr name="animDuration" format="integer" />
+        <attr name="animAlphaStart" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="ScrollingEffect">
+        <attr name="scrolling_factor" format="float" />
+        <attr name="alpha_factor" format="float" />
+        <attr name="inner_scrolling_factor" format="float" />
+        <attr name="scrolling_views_num" format="integer" />
+        <attr name="circular_scrolling" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="CircleProgressBar">
+        <attr name="mlpb_inner_radius" format="dimension" />
+        <attr name="mlpb_background_color" format="color" />
+        <attr name="mlpb_progress_color" format="reference" />
+        <attr name="mlpb_progress_stoke_width" format="dimension" />
+        <attr name="mlpb_show_arrow" format="boolean" />
+        <attr name="mlpb_enable_circle_background" format="boolean" />
+        <attr name="mlpb_arrow_width" format="dimension" />
+        <attr name="mlpb_arrow_height" format="dimension" />
+    </declare-styleable>
+
+</resources>
