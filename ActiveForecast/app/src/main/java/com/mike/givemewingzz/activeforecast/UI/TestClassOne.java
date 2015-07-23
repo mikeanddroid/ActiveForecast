@@ -121,9 +121,7 @@ public class TestClassOne extends CoreFragment implements BroadcastReceiverFragm
     }
 
     public Set getIntentFilters() {
-        return new HashSet(Arrays.asList(new String[]{
-                "CURRENT_WEATHER_DATA"
-        }));
+        return new HashSet(Arrays.asList(ApplicationUtils.Receivers.CURRENT_WEATHER_DATA));
     }
 
     private void setupToolbar(View view) {

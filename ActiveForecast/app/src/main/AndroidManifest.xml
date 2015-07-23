@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mike.givemewingzz.activeforecast" >
+    package="com.mike.givemewingzz.activeforecast">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
+        android:name=".UI.CoreApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name="com.mike.givemewingzz.activeforecast.UI.CallingActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,8 +23,26 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="AA_DB_NAME" android:value="activeweather.db"/>
-        <meta-data android:name="AA_DB_VERSION" android:value="1"/>
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="activeweatherrefactored.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="1" />
+
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="
+            com.mike.givemewingzz.activeforecast.servermapping.CurrentWeather,
+            com.mike.givemewingzz.activeforecast.servermapping.Weather,
+            com.mike.givemewingzz.activeforecast.servermapping.Coordinates,
+            com.mike.givemewingzz.activeforecast.servermapping.ActualData,
+            com.mike.givemewingzz.activeforecast.servermapping.WindData,
+            com.mike.givemewingzz.activeforecast.servermapping.OtherData" />
+
+        <service
+            android:name="com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.service.NetworkService"
+            android:exported="false" />
 
     </application>
 

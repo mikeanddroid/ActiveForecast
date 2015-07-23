@@ -8,9 +8,6 @@ import com.mike.givemewingzz.activeforecast.navigationframework.navigation.CoreN
 public class TestClassTwoActivity extends CoreNavigationActivity
 {
 
-    public TestClassTwoActivity()
-    {
-    }
     @Override
     protected void onCreate(Bundle bundle)
     {

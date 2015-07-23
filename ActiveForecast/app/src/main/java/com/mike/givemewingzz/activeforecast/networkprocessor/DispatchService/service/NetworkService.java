@@ -221,7 +221,6 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
                     List<WeatherModel> sysWeatherListJson = OtherData.createFromJSONObject(OtherData.class, sysJson);
                     List<WeatherModel> weatherListWeatherJson = Weather.createFromJSONList(Weather.class, weatherJsonArray);
 
-
                     Log.d(TAG, "Beginning ActualData transaction");
                     ActiveAndroid.beginTransaction();
 

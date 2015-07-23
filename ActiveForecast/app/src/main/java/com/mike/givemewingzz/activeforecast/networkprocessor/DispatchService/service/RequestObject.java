@@ -42,7 +42,7 @@ public class RequestObject implements Parcelable {
     /**
      * Hashmap for key value pair for request data to the server.
      */
-    private Bundle requestBundle;
+    private Bundle requestBundle = null;
 
     /**
      * Each request is assigned a unique session key that allows for canceling  one specific request from a group that has the same identifier.
@@ -62,6 +62,68 @@ public class RequestObject implements Parcelable {
         BROADCAST_ACTION = ApplicationUtils.getReceiverForType(dataTypeID);
         sessionIdentifier = SessionCreator.getElapsedSessionId(BROADCAST_ACTION);
     }
+
+    /**
+     * @param parcelIn parcel holding data stored in <code>writeToParcel()</code>
+     */
+    private RequestObject(Parcel parcelIn) {
+        REQUEST_TYPE = parcelIn.readInt();
+        shouldCancelRequest = parcelIn.readInt() == 1;
+        DATA_TYPE_ID = parcelIn.readInt();
+        sessionIdentifier = parcelIn.readString();
+        requestBundle = parcelIn.readBundle(CoreApplication.class.getClassLoader());
+        authBundle = parcelIn.readBundle(CoreApplication.class.getClassLoader());
+        BROADCAST_ACTION = parcelIn.readString();
+        BASE_URL = parcelIn.readString();
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeInt(REQUEST_TYPE);
+        parcel.writeInt(shouldCancelRequest ? 1 : 0);
+        parcel.writeInt(DATA_TYPE_ID);
+        parcel.writeString(sessionIdentifier);
+        parcel.writeBundle(requestBundle);
+        parcel.writeBundle(authBundle);
+        parcel.writeString(BROADCAST_ACTION);
+        parcel.writeString(BASE_URL);
+    }
+
+    public RequestObject copyObject() {
+        RequestObject requestobject = new RequestObject();
+        requestobject.setREQUEST_TYPE(REQUEST_TYPE);
+        requestobject.setShouldCancelRequest(shouldCancelRequest);
+        requestobject.setDATA_TYPE_ID(DATA_TYPE_ID);
+        requestobject.setRequestBundle(requestBundle);
+        requestobject.setAuthBundle(authBundle);
+        requestobject.setBROADCAST_ACTION(BROADCAST_ACTION);
+        requestobject.setBASE_URL(BASE_URL);
+        requestobject.setSessionIdentifier(sessionIdentifier);
+        return requestobject;
+    }
+
+    /**
+     *
+     * This field is needed for Android to be able to create new objects,
+     * individually or as arrays. This also means that you can use use the
+     * default constructor to create the object and use another method to
+     * hyrdate it as necessary.
+     *
+     * @since 1.0
+     *
+     */
+    public static final Parcelable.Creator<RequestObject> CREATOR = new Parcelable.Creator<RequestObject>() {
+
+        public RequestObject createFromParcel(Parcel parcel) {
+            return new RequestObject(parcel);
+        }
+
+        public RequestObject[] newArray(int size) {
+            return new RequestObject[size];
+        }
+
+    };
 
     public static int getMethodDelete() {
         return 3;
@@ -147,46 +209,6 @@ public class RequestObject implements Parcelable {
         shouldCancelRequest = flag;
     }
 
-    public static final Creator CREATOR = new Creator() {
-
-        public RequestObject createFromParcel(Parcel parcel) {
-            return new RequestObject(parcel);
-        }
-
-        public RequestObject[] newArray(int size) {
-            return new RequestObject[size];
-        }
-
-    };
-
-
-    /**
-     * @param parcelIn parcel holding data stored in <code>writeToParcel()</code>
-     */
-    private RequestObject(Parcel parcelIn) {
-        REQUEST_TYPE = parcelIn.readInt();
-        shouldCancelRequest = parcelIn.readInt() == 1;
-        DATA_TYPE_ID = parcelIn.readInt();
-        sessionIdentifier = parcelIn.readString();
-        requestBundle = parcelIn.readBundle(CoreApplication.class.getClassLoader());
-        authBundle = parcelIn.readBundle(CoreApplication.class.getClassLoader());
-        BROADCAST_ACTION = parcelIn.readString();
-        BASE_URL = parcelIn.readString();
-
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(REQUEST_TYPE);
-        parcel.writeInt(shouldCancelRequest ? 1 : 0);
-        parcel.writeInt(DATA_TYPE_ID);
-        parcel.writeBundle(requestBundle);
-        parcel.writeBundle(authBundle);
-        parcel.writeString(BROADCAST_ACTION);
-        parcel.writeString(BASE_URL);
-        parcel.writeString(sessionIdentifier);
-    }
-
     public String toString() {
         return (new StringBuilder())
                 .append("RequestObject{methodType=").append(REQUEST_TYPE)
@@ -199,19 +221,6 @@ public class RequestObject implements Parcelable {
                 .append('\'').append(", broadcastAction='")
                 .append(BROADCAST_ACTION).append('\'').append('}')
                 .toString();
-    }
-
-    public RequestObject copyObject() {
-        RequestObject requestobject = new RequestObject();
-        requestobject.setREQUEST_TYPE(REQUEST_TYPE);
-        requestobject.setShouldCancelRequest(shouldCancelRequest);
-        requestobject.setDATA_TYPE_ID(DATA_TYPE_ID);
-        requestobject.setRequestBundle(requestBundle);
-        requestobject.setSessionIdentifier(sessionIdentifier);
-        requestobject.setAuthBundle(authBundle);
-        requestobject.setBASE_URL(BASE_URL);
-        requestobject.setBROADCAST_ACTION(BROADCAST_ACTION);
-        return requestobject;
     }
 
 }

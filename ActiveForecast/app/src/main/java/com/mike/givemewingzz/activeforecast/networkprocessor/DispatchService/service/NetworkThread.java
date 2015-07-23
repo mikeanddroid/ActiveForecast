@@ -187,7 +187,7 @@ public class NetworkThread extends Thread {
         Request request = null;
 
         if (headers == null) {
-            switch (requestObject.getDATA_TYPE_ID()) {
+            switch (requestObject.getREQUEST_TYPE()) {
                 case RequestObject.METHOD_GET:
                     request = new Request.Builder().url(url).get().build();
                     break;
@@ -196,7 +196,7 @@ public class NetworkThread extends Thread {
                     break;
             }
         } else {
-            switch (requestObject.getDATA_TYPE_ID()) {
+            switch (requestObject.getREQUEST_TYPE()) {
                 case RequestObject.METHOD_GET:
                     request = new Request.Builder().url(url).headers(headers.build()).get().build();
                     break;

@@ -27,6 +27,7 @@ public class RequestDispatch
         Log.d(TAG, "Request Current Weather Data");
         Bundle authbundle = new Bundle();
         authbundle.putString("zip", zipCode);
+
         RequestObject requestObject = new RequestObject(ApplicationUtils.RequestType.CURRENT_WEATHER_DATA);
         requestObject.setBASE_URL(CURRENT_WEATHER_BASE_URL);
         requestObject.setREQUEST_TYPE(RequestObject.METHOD_GET);
