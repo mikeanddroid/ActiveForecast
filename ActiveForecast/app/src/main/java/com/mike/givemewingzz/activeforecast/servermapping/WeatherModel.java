@@ -22,10 +22,6 @@ public abstract class WeatherModel extends Model
     private static final String TAG = WeatherModel.class.getSimpleName();
     private static final Map<String, Map<String, String>> fieldMapping = Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
 
-    public WeatherModel()
-    {
-    }
-
     public static List createFromJSONList(Class class1, JSONArray jsonarray)
         throws JSONException, InstantiationException, IllegalAccessException
     {
@@ -45,13 +41,13 @@ public abstract class WeatherModel extends Model
         throws JSONException, InstantiationException, IllegalAccessException
     {
         ArrayList arraylist = new ArrayList();
-        JSONObject jsonobject1 = null;
+        JSONObject tempJsonObject = null;
         for (int i = 0; i < jsonobject.length(); i++)
         {
-            jsonobject1 = jsonobject;
+            tempJsonObject = jsonobject;
         }
 
-        arraylist.add(createFromJson(class1, jsonobject1));
+        arraylist.add(createFromJson(class1, tempJsonObject));
         return arraylist;
     }
 

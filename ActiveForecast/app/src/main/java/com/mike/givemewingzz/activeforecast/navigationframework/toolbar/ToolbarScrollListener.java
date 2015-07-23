@@ -24,10 +24,10 @@ public class ToolbarScrollListener extends RecyclerView.OnScrollListener {
         scrollAmount += dy;
 
         // The hide threshold is 20% lower than the show to prevent bouncing toolbar syndrome //
-        if (scrollAmount >= (((float)scrollThreshold) + ((float)scrollThreshold) * .2)) {
+        if (scrollAmount >= (((float) scrollThreshold) + ((float) scrollThreshold) * .2)) {
             callback.onHideToolbar();
         } else if (scrollAmount < scrollThreshold || !recyclerView.canScrollVertically(-1)) {
-        callback.onShowToolbar();
+            callback.onShowToolbar();
         }
     }
 

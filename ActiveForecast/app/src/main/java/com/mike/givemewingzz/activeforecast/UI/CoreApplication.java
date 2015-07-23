@@ -1,16 +1,10 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.mike.givemewingzz.activeforecast.UI;
 
 import android.content.Context;
-import com.activeandroid.app.Application;
-import com.example.givemewingz.activeforecast.mike.services.DatabaseManager;
-import com.example.givemewingz.activeforecast.mike.services.process.dispatch.RequestDispatch;
 
-// Referenced classes of package com.example.givemewingz.activeforecast.mike.core:
-//            ApplicationPreferences
+import com.activeandroid.app.Application;
+import com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.DatabaseFramework.DatabaseManager;
+import com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.RequestDispatch;
 
 public class CoreApplication extends Application
 {

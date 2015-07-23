@@ -1,4 +1,4 @@
-package com.mike.givemewingzz.activeforecast.broadcastnavigator;
+package com.mike.givemewingzz.activeforecast.broadcastframework.broadcastnavigator;
 
 import android.content.Intent;
 

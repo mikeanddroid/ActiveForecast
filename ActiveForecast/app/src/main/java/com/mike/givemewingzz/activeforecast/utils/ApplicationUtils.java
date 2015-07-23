@@ -112,6 +112,12 @@ public class ApplicationUtils
     {
     }
 
+    public static class ApplicationConstants {
+
+        public static final String LOG_TAG_SOMETHING_WENT_WRONG = "Something went wrong!!";
+
+    }
+
     public static String getReceiverForType(int i)
     {
         switch (i)

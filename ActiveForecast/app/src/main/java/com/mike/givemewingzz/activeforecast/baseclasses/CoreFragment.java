@@ -18,8 +18,8 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
 import com.mike.givemewingzz.activeforecast.R;
-import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastBridge;
-import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastReceiverFragment;
+import com.mike.givemewingzz.activeforecast.broadcastframework.broadcastnavigator.BroadcastBridge;
+import com.mike.givemewingzz.activeforecast.broadcastframework.broadcastnavigator.BroadcastReceiverFragment;
 import com.mike.givemewingzz.activeforecast.navigationframework.navigation.CoreNavigationActivity;
 import com.mike.givemewingzz.activeforecast.navigationframework.navigation.NavigationHandler;
 import com.mike.givemewingzz.activeforecast.navigationframework.navigation.UserDataState;

@@ -1,4 +1,4 @@
-package com.mike.givemewingzz.activeforecast.broadcastnavigator;
+package com.mike.givemewingzz.activeforecast.broadcastframework.broadcastnavigator;
 
 import java.util.ArrayList;
 import java.util.Collections;

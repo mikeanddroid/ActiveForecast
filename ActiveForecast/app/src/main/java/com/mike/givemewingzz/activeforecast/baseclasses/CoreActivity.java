@@ -14,9 +14,9 @@ import android.util.Log;
 
 import com.mike.givemewingzz.activeforecast.R;
 import com.mike.givemewingzz.activeforecast.applicationhandlers.FragmentTransactionHandler;
-import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastBridge;
-import com.mike.givemewingzz.activeforecast.broadcastnavigator.BroadcastReceiverFragment;
-import com.mike.givemewingzz.activeforecast.broadcastnavigator.FilteredBroadcastManger;
+import com.mike.givemewingzz.activeforecast.broadcastframework.broadcastnavigator.BroadcastBridge;
+import com.mike.givemewingzz.activeforecast.broadcastframework.broadcastnavigator.BroadcastReceiverFragment;
+import com.mike.givemewingzz.activeforecast.broadcastframework.broadcastnavigator.FilteredBroadcastManger;
 import com.mike.givemewingzz.activeforecast.navigationframework.toolbar.FragmentTransactionAnimation;
 import com.mike.givemewingzz.activeforecast.utils.ApplicationUtils;
 
