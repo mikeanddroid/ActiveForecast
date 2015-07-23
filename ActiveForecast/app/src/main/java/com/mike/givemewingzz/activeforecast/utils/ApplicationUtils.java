@@ -1,6 +1,10 @@
 package com.mike.givemewingzz.activeforecast.utils;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 public class ApplicationUtils
 {
     static class ApiEndpoints
@@ -116,6 +120,19 @@ public class ApplicationUtils
 
         public static final String LOG_TAG_SOMETHING_WENT_WRONG = "Something went wrong!!";
 
+        /**
+         * Denotes the actual keys and number of key value pairs that is in this bundle.
+         * Used to provide a framework to transport values that will later become a JSONArray
+         * of key-value pairs.
+         */
+        public static final String BUNDLE_OBJECT_NUM = "BUNDLE_OBJECT";
+        /**
+         * Denotes the actual keys and number of key value pairs that is in this bundle.
+         * Used to provide a framework to transport values that will later become a JSONArray
+         * of values only. Its use will create a JSONObject of array type {key:[val1,val2,val3]}
+         */
+        public static final String BUNDLE_OBJECT_KEYS_ONLY = "BUNDLE_OBJECT_KEYS_ONLY";
+
     }
 
     public static String getReceiverForType(int i)
@@ -138,4 +155,15 @@ public class ApplicationUtils
             return "HISTORIC_WEATHER_DATA";
         }
     }
+
+    private static ConnectivityManager getConnectivityManager(Context context){
+        return (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    public static boolean isNetworkConnected(Context context){
+
+        NetworkInfo netInfo = getConnectivityManager(context).getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
 }
