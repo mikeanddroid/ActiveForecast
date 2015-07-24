@@ -38,7 +38,8 @@
             com.mike.givemewingzz.activeforecast.servermapping.Coordinates,
             com.mike.givemewingzz.activeforecast.servermapping.ActualData,
             com.mike.givemewingzz.activeforecast.servermapping.WindData,
-            com.mike.givemewingzz.activeforecast.servermapping.OtherData" />
+            com.mike.givemewingzz.activeforecast.servermapping.OtherData,
+            com.mike.givemewingzz.activeforecast.servermapping.ItunesModel"/>
 
         <service
             android:name="com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.service.NetworkService"

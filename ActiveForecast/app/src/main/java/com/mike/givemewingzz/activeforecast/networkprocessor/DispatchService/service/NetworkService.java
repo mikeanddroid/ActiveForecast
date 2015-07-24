@@ -16,6 +16,7 @@ import com.mike.givemewingzz.activeforecast.networkprocessor.DispatchService.exc
 import com.mike.givemewingzz.activeforecast.servermapping.ActualData;
 import com.mike.givemewingzz.activeforecast.servermapping.Coordinates;
 import com.mike.givemewingzz.activeforecast.servermapping.CurrentWeather;
+import com.mike.givemewingzz.activeforecast.servermapping.ItunesModel;
 import com.mike.givemewingzz.activeforecast.servermapping.OtherData;
 import com.mike.givemewingzz.activeforecast.servermapping.Weather;
 import com.mike.givemewingzz.activeforecast.servermapping.WeatherModel;
@@ -143,7 +144,6 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
 
     }
 
-
     public void processResponse(ResponseObject responseobject) {
 
         Log.i(TAG, "Inside Process Response");
@@ -179,6 +179,12 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
 
                         break;
 
+                    case ApplicationUtils.RequestType.ITUNES_DATA:
+                        processItunesData(responseobject);
+                        Log.i(TAG, "Inside ITUNES_DATA Response");
+
+                        break;
+
                     default:
                         Log.i(TAG, "processResponse default: ");
                         break;
@@ -192,6 +198,59 @@ public class NetworkService extends Service implements ServiceTimeoutTimer.Servi
 
         } else {
             Log.e(TAG, "processResponse responseObject is null: ");
+        }
+
+    }
+
+    public void processItunesData(ResponseObject responseObject){
+
+        Log.d(TAG,"processItunesData");
+
+        if(responseObject!=null){
+
+            boolean isSuccess = false;
+
+            if(responseObject.getCode() == ResponseObject.SUCCESS){
+
+                try{
+
+                    JSONArray itunesJSONArray = responseObject.getJsonObject().getJSONArray("results");
+
+                    List<ItunesModel> currentWeatherJson = ItunesModel.createFromJSONList(ItunesModel.class, itunesJSONArray);
+
+                    Log.d(TAG, "Beginning Itunes Data transaction");
+                    ActiveAndroid.beginTransaction();
+
+                    new Delete().from(ItunesModel.class).execute();
+
+                    for (int i = 0; i < currentWeatherJson.size(); i++) {
+
+                        ItunesModel itunesModel = (ItunesModel) currentWeatherJson.get(i);
+
+                        itunesModel.save();
+
+                    }
+
+                    ActiveAndroid.setTransactionSuccessful();
+                    Log.d(TAG, "Itunes transaction Success");
+
+                    isSuccess = true;
+
+                }catch (Exception e){
+
+                    isSuccess = false;
+                    Log.e(TAG, "Itunes Data failed " + e, e);
+
+                }finally {
+
+                    ActiveAndroid.endTransaction();
+                    sendLocalBroadcast(isSuccess, responseObject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
+
+                }
+
+            }else {
+                sendLocalBroadcast(isSuccess, responseObject.getOriginalRequestObject().getBROADCAST_ACTION(), null);
+            }
         }
 
     }

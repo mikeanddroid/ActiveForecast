@@ -93,6 +93,8 @@ public class ApplicationUtils
         public static final String HISTORIC_WEATHER_DATA = "HISTORIC_WEATHER_DATA";
         public static final String HOURLY_WEATHER_DATA = "HOURLY_WEATHER_DATA";
 
+        public static final String ITUNES_DATA_FILTER = "ITUNES_DATA_FILTER";
+
         public Receivers()
         {
         }
@@ -105,6 +107,10 @@ public class ApplicationUtils
         public static final int FORECAST_WEATHER_DATA = 102;
         public static final int HISTORIC_WEATHER_DATA = 103;
         public static final int HOURLY_WEATHER_DATA = 101;
+
+        public static final int ITUNES_DATA = 110;
+
+
 
         public RequestType()
         {
@@ -153,6 +159,11 @@ public class ApplicationUtils
 
         case 103: // 'g'
             return "HISTORIC_WEATHER_DATA";
+
+        case 110:
+
+            return "ITUNES_DATA_FILTER";
+
         }
     }
 

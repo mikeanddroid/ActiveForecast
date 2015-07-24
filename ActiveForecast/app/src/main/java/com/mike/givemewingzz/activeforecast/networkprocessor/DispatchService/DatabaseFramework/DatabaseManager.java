@@ -11,6 +11,7 @@ import com.activeandroid.query.Select;
 import com.mike.givemewingzz.activeforecast.servermapping.ActualData;
 import com.mike.givemewingzz.activeforecast.servermapping.Coordinates;
 import com.mike.givemewingzz.activeforecast.servermapping.CurrentWeather;
+import com.mike.givemewingzz.activeforecast.servermapping.ItunesModel;
 import com.mike.givemewingzz.activeforecast.servermapping.OtherData;
 import com.mike.givemewingzz.activeforecast.servermapping.Weather;
 import com.mike.givemewingzz.activeforecast.servermapping.WindData;
@@ -64,6 +65,17 @@ public class DatabaseManager {
         return Cache.openDatabase().rawQuery(query, null);
     }
 
+    public Cursor fetchItunesCursor(){
+
+        String tableName = getTableName(ItunesModel.class);
+
+        String query = new Select(tableName + ".*, " + tableName + ".Id as _id").from(ItunesModel.class).toSql();
+
+        // Execute query on the underlying ActiveAndroid SQLite database
+        return Cache.openDatabase().rawQuery(query, null);
+
+    }
+
     public AsyncResponseTask fetchCurrentWeather(AsyncResponseListener asyncresponselistener) {
 
         Log.d(TAG, "Inside fetchCurrentWeather");
@@ -79,6 +91,65 @@ public class DatabaseManager {
         asyncTask.execute(actualFrom, currentFrom, weatherFrom, windFrom, dataFrom, coordinatesFrom);
 
         return asyncTask;
+    }
+
+    public ItunesResponseTask fetchItunesData(ItunesResponseListener itunesResponseListener){
+
+        Log.d(TAG, "Inside fetchItunesData");
+
+        From itunesFrom = new Select().from(ItunesModel.class);
+
+        ItunesResponseTask asyncTask = new ItunesResponseTask(itunesResponseListener);
+        asyncTask.execute(itunesFrom);
+
+        return asyncTask;
+
+    }
+
+    public class ItunesResponseTask extends AsyncTask<From, Integer, ItunesResponse>{
+
+        private ItunesResponseListener itunesResponseListener;
+
+        public ItunesResponseTask(ItunesResponseListener itunesResponseListener) {
+            this.itunesResponseListener = itunesResponseListener;
+        }
+
+        @Override
+        protected ItunesResponse doInBackground(From... params) {
+
+            List<Model> itunesList = new ArrayList<>();
+
+            List<ItunesModel> itunesModelList = new ArrayList<>();
+
+            itunesList.addAll(params[0].execute());
+
+            List<WrapperClass> mainList = new ArrayList<>();
+
+            try{
+
+                for (Model model : itunesList) {
+
+                    WrapperClass wrapperClass = new WrapperClass(model, WrapperClass.ITUNES_WRAPPER_DATA);
+
+                    mainList.add(wrapperClass);
+
+                    itunesModelList.add((ItunesModel) model);
+                }
+
+            }catch (Exception e){
+
+                Log.e(TAG, "Array out of bounds.", e);
+
+            }
+
+            return new ItunesResponse(itunesModelList, mainList);
+        }
+
+        @Override
+        protected void onPostExecute(ItunesResponse itunesResponse) {
+            itunesResponseListener.onItunesRequestComplete(itunesResponse);
+        }
+
     }
 
     public class AsyncResponseTask extends AsyncTask<From, Integer, AsyncResponse> {
@@ -189,6 +260,25 @@ public class DatabaseManager {
     public interface AsyncResponseListener {
 
         void onRequestComplete(AsyncResponse asyncresponse);
+    }
+
+    public interface ItunesResponseListener{
+
+        void onItunesRequestComplete(ItunesResponse itunesResponse);
+
+    }
+
+    public class ItunesResponse{
+
+        public List<ItunesModel> itunesModel;
+
+        public List<WrapperClass> mainList;
+
+        public ItunesResponse(List<ItunesModel> itunesModel,List<WrapperClass> mainList ){
+            this.itunesModel = itunesModel;
+            this.mainList = mainList;
+        }
+
     }
 
     public class AsyncResponse {

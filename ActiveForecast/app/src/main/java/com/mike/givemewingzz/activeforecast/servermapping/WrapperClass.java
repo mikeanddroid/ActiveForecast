@@ -14,6 +14,7 @@ public class WrapperClass
     public static final int THREE_DAYS_FORECAST = 9;
     public static final int WEATHER_DATA_WEATHER = 3;
     public static final int WIND_DATA_WEATHER = 4;
+    public static final int ITUNES_WRAPPER_DATA = 10;
     private int idType;
     private Model object;
 

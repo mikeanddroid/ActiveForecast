@@ -13,8 +13,12 @@ public class RequestDispatch
 {
 
     public static final String CURRENT_WEATHER_BASE_URL = "http://api.openweathermap.org/data/2.5/weather";
+
     public static final String FORECAST_WEATHER_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
     public static final String HOURLY_WEATHER_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast?";
+
+    public static final String ITUNES_BASE_URL = "https://itunes.apple.com/search";
+
     public static final String TAG = RequestDispatch.class.getSimpleName();
 
     public RequestDispatch()
@@ -41,6 +45,29 @@ public class RequestDispatch
 
         networkService.putExtras(bundle);
         CoreApplication.context.startService(networkService);
+    }
+
+    public void requestItunesData(String term, String limit, boolean flag){
+
+        Log.d(TAG, "Request Itunes Data");
+        Bundle authbundle = new Bundle();
+        authbundle.putString("term", term);
+        authbundle.putString("limit", limit);
+
+        RequestObject requestObject = new RequestObject(ApplicationUtils.RequestType.ITUNES_DATA);
+        requestObject.setBASE_URL(ITUNES_BASE_URL);
+        requestObject.setREQUEST_TYPE(RequestObject.METHOD_GET);
+        requestObject.setShouldCancelRequest(flag);
+        requestObject.setRequestBundle(authbundle);
+
+        Intent networkService = new Intent(CoreApplication.context, NetworkService.class);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ApplicationUtils.IntentKey.REQUEST_KEY, requestObject);
+
+        networkService.putExtras(bundle);
+        CoreApplication.context.startService(networkService);
+
     }
 
 }
