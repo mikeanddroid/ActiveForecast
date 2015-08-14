@@ -7,7 +7,7 @@ import com.activeandroid.annotation.Table;
  * Created by GiveMeWingzz on 7/23/2015.
  */
 
-@Table(name = "ActualData")
+@Table(name = "ItunesData")
 public class ItunesModel extends WeatherModel {
 
     @Column(name = "WrapperType")

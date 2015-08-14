@@ -142,28 +142,28 @@ public class CallingFragment extends CoreFragment implements BroadcastReceiverFr
 
             case ApplicationUtils.Receivers.CURRENT_WEATHER_DATA:
 
-                Log.d(TAG, "CURRENT_WEATHER_DATA Broadcast Failed!!");
+                Log.d(TAG, "CURRENT_WEATHER_DATA Broadcast Failed!!!");
                 break;
 
             case ApplicationUtils.Receivers.ITUNES_DATA_FILTER:
 
-                Log.d(TAG, "ITUNES_DATA_FILTER Broadcast Failed!!");
+                Log.d(TAG, "ITUNES_DATA_FILTER Broadcast Failed!!!");
 
                 break;
 
             case ApplicationUtils.Receivers.HOURLY_WEATHER_DATA:
 
-                Log.d(TAG, "HOURLY_WEATHER_DATA Broadcast Failed!!");
+                Log.d(TAG, "HOURLY_WEATHER_DATA Broadcast Failed!!!");
 
                 break;
             case ApplicationUtils.Receivers.FORECAST_WEATHER_DATA:
 
-                Log.d(TAG, "FORECAST_WEATHER_DATA Broadcast Failed!!");
+                Log.d(TAG, "FORECAST_WEATHER_DATA Broadcast Failed!!!");
 
                 break;
             case ApplicationUtils.Receivers.HISTORIC_WEATHER_DATA:
 
-                Log.d(TAG, "HISTORIC_WEATHER_DATA Broadcast Failed!!");
+                Log.d(TAG, "HISTORIC_WEATHER_DATA Broadcast Failed!!!");
 
                 break;
 
@@ -348,7 +348,7 @@ public class CallingFragment extends CoreFragment implements BroadcastReceiverFr
             case R.id.itunesdispatch:
 
                 Log.d(TAG,"Start of the Request");
-                CoreApplication.getInstance().getRequestDispatch().requestItunesData("all", "100", false);
+                CoreApplication.getInstance().getRequestDispatch().requestItunesData("all", "10", false);
                 break;
 
         }
